@@ -2,6 +2,8 @@
 
 A Chrome extension that replaces the default bookmark dialog with a fast, searchable folder picker. Type to instantly filter through all your bookmark folders — including nested ones — without scrolling through a long flat list.
 
+![Advanced Bookmarks screenshot](screenshots/image%20copy%203.png)
+
 ---
 
 ## Features
