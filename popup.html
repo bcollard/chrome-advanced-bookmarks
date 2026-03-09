@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Bookmarks</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="app">
+
+    <!-- Non-bookmarkable page warning -->
+    <div class="warning" id="chrome-warning" style="display:none">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+      </svg>
+      <span>This page cannot be bookmarked.</span>
+    </div>
+
+    <!-- Main content -->
+    <div id="main-content">
+
+      <!-- Header -->
+      <header class="header">
+        <svg class="header-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+        </svg>
+        <h1 class="header-title" id="header-title">Add Bookmark</h1>
+      </header>
+
+      <!-- Form -->
+      <div class="form">
+
+        <!-- Name -->
+        <div class="field">
+          <label class="label" for="title">Name</label>
+          <input
+            type="text"
+            id="title"
+            class="input"
+            placeholder="Page title"
+            autocomplete="off"
+            spellcheck="false"
+          >
+        </div>
+
+        <!-- URL (read-only) -->
+        <div class="field">
+          <label class="label" for="url">URL</label>
+          <input
+            type="text"
+            id="url"
+            class="input input--url"
+            readonly
+            tabindex="-1"
+          >
+        </div>
+
+        <!-- Folder picker -->
+        <div class="field">
+          <label class="label" for="folder-input">Folder</label>
+          <div class="folder-picker" id="folder-picker">
+            <input
+              type="text"
+              id="folder-input"
+              class="input folder-picker__input"
+              placeholder="Search folders…"
+              autocomplete="off"
+              spellcheck="false"
+              role="combobox"
+              aria-expanded="false"
+              aria-haspopup="listbox"
+              aria-autocomplete="list"
+            >
+            <svg class="folder-picker__chevron" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M7 10l5 5 5-5z"/>
+            </svg>
+            <!-- Dropdown -->
+            <div class="dropdown" id="dropdown" role="listbox" style="display:none"></div>
+          </div>
+        </div>
+
+      </div><!-- /.form -->
+
+      <!-- Footer -->
+      <footer class="footer">
+        <button type="button" class="btn btn--danger" id="remove-btn" style="display:none">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+          </svg>
+          Remove
+        </button>
+        <div class="footer-right">
+          <button type="button" class="btn btn--secondary" id="cancel-btn">Cancel</button>
+          <button type="button" class="btn btn--primary" id="submit-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+            </svg>
+            <span id="submit-label">Save</span>
+          </button>
+        </div>
+      </footer>
+
+    </div><!-- /#main-content -->
+
+    <!-- Success overlay -->
+    <div class="success-overlay" id="success-overlay">
+      <div class="success-content">
+        <div class="success-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+          </svg>
+        </div>
+        <span class="success-msg" id="success-msg">Bookmark saved!</span>
+      </div>
+    </div>
+
+    <!-- New folder dialog -->
+    <div class="nf-backdrop" id="nf-backdrop" style="display:none">
+      <div class="nf-dialog" role="dialog" aria-modal="true" aria-labelledby="nf-title">
+        <h2 class="nf-title" id="nf-title">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-1 8h-3v3h-2v-3h-3v-2h3V9h2v3h3v2z"/>
+          </svg>
+          New folder
+        </h2>
+        <div class="field">
+          <label class="label" for="nf-name">Name</label>
+          <input type="text" id="nf-name" class="input" placeholder="Folder name" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="field">
+          <label class="label" for="nf-parent">Location</label>
+          <select id="nf-parent" class="input nf-select"></select>
+        </div>
+        <div class="nf-actions">
+          <button type="button" class="btn btn--secondary" id="nf-cancel">Cancel</button>
+          <button type="button" class="btn btn--primary" id="nf-create">Create</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.app -->
+
+  <script src="popup.js"></script>
+</body>
+</html>
