@@ -6,6 +6,7 @@
 
 let allFolders = [];        // All bookmark folders (flat list with path info)
 let filteredFolders = [];   // Currently visible in dropdown
+let filteredMatchData = null; // Parallel to filteredFolders: { nameIndices, pathIndices } per entry
 let selectedFolder = null;  // The chosen folder object
 let highlightedIndex = -1;  // Keyboard-navigation index in filteredFolders
 let isDropdownOpen = false;
@@ -73,7 +74,9 @@ async function init() {
     // 4. Check for an existing bookmark
     if (bookmarkable && tab.url) {
       const results = await chrome.bookmarks.search({ url: tab.url });
-      existingBookmark = results.length > 0 ? results[0] : null;
+      existingBookmark = results.length > 0
+        ? results.reduce((latest, b) => (b.dateAdded ?? 0) > (latest.dateAdded ?? 0) ? b : latest)
+        : null;
     }
 
     // 5. Populate title field
@@ -165,21 +168,30 @@ function updateFolderDisplay() {
 // ============================================================
 
 function openDropdown(query) {
-  const q = (query ?? '').trim().toLowerCase();
+  const q = (query ?? '').trim();
+  const qCompact = q.replace(/\s+/g, '').toLowerCase();
 
-  // Filter folders by name or full path
-  filteredFolders = q === ''
-    ? [...allFolders]
-    : allFolders.filter(f =>
-        f.title.toLowerCase().includes(q) ||
-        f.fullPath.toLowerCase().includes(q)
-      );
-
-  // Set the initial highlighted row
-  if (q === '') {
+  if (qCompact === '') {
+    filteredFolders = [...allFolders];
+    filteredMatchData = null;
     highlightedIndex = filteredFolders.findIndex(f => f.id === selectedFolder?.id);
     if (highlightedIndex < 0) highlightedIndex = 0;
   } else {
+    const scored = [];
+    for (const f of allFolders) {
+      const nameMatch = fuzzyMatch(f.title, qCompact);
+      const pathStr   = f.pathParts.join(' › ');
+      const pathMatch = f.pathParts.length > 0 ? fuzzyMatch(pathStr, qCompact) : { matched: false, indices: [] };
+      if (!nameMatch.matched && !pathMatch.matched) continue;
+      // Prefer matches in the folder name; path-only matches get a score penalty
+      const score = nameMatch.matched
+        ? fuzzyScore(nameMatch.indices)
+        : fuzzyScore(pathMatch.indices) + 10000;
+      scored.push({ folder: f, score, nameIndices: nameMatch.indices, pathIndices: pathMatch.indices });
+    }
+    scored.sort((a, b) => a.score - b.score);
+    filteredFolders  = scored.map(s => s.folder);
+    filteredMatchData = scored.map(s => ({ nameIndices: s.nameIndices, pathIndices: s.pathIndices }));
     highlightedIndex = filteredFolders.length > 0 ? 0 : -1;
   }
 
@@ -216,14 +228,16 @@ function renderDropdown(query) {
       const isHighlighted = index === highlightedIndex;
       const isSelected    = folder.id === selectedFolder?.id;
 
-      const nameHtml = query
-        ? highlightMatch(folder.title, query)
+      const matchData = filteredMatchData?.[index];
+      const nameHtml = matchData?.nameIndices?.length
+        ? highlightFuzzy(folder.title, matchData.nameIndices)
         : escapeHtml(folder.title);
 
+      const pathStr  = folder.pathParts.join(' › ');
       const pathHtml = folder.pathParts.length > 0
-        ? `<div class="item-path">${query
-            ? highlightMatch(folder.pathParts.join(' › '), query)
-            : escapeHtml(folder.pathParts.join(' › '))}</div>`
+        ? `<div class="item-path">${matchData?.pathIndices?.length
+            ? highlightFuzzy(pathStr, matchData.pathIndices)
+            : escapeHtml(pathStr)}</div>`
         : '';
 
       const classes = [
@@ -558,11 +572,54 @@ function escapeHtml(str) {
 }
 
 /**
- * Wrap every occurrence of `query` (case-insensitive) in the text with <mark>.
- * The text is HTML-escaped first to prevent injection.
+ * Fuzzy subsequence match.
+ * `compactQuery` must already be lowercased with spaces removed.
+ * Returns { matched: bool, indices: number[] } where indices are char positions in `text`.
  */
-function highlightMatch(text, query) {
-  const safe = escapeHtml(text);
-  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return safe.replace(new RegExp(`(${escapedQuery})`, 'gi'), '<mark>$1</mark>');
+function fuzzyMatch(text, compactQuery) {
+  const t = text.toLowerCase();
+  const indices = [];
+  let ti = 0;
+  for (let qi = 0; qi < compactQuery.length; qi++) {
+    const found = t.indexOf(compactQuery[qi], ti);
+    if (found === -1) return { matched: false, indices: [] };
+    indices.push(found);
+    ti = found + 1;
+  }
+  return { matched: true, indices };
+}
+
+/**
+ * Score a fuzzy match result — lower is better.
+ * Rewards early starts and consecutive character runs.
+ */
+function fuzzyScore(indices) {
+  if (indices.length === 0) return 0;
+  let score = indices[0]; // penalty for starting late
+  for (let i = 1; i < indices.length; i++) {
+    score += (indices[i] - indices[i - 1] - 1); // gap penalty
+  }
+  return score;
+}
+
+/**
+ * Wrap matched character positions in <mark> tags.
+ * Consecutive matched chars are wrapped in a single <mark> for cleaner HTML.
+ */
+function highlightFuzzy(text, indices) {
+  const indexSet = new Set(indices);
+  let result = '';
+  let inMark = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = escapeHtml(text[i]);
+    if (indexSet.has(i)) {
+      if (!inMark) { result += '<mark>'; inMark = true; }
+      result += ch;
+    } else {
+      if (inMark) { result += '</mark>'; inMark = false; }
+      result += ch;
+    }
+  }
+  if (inMark) result += '</mark>';
+  return result;
 }
