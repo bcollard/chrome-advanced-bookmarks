@@ -96,8 +96,9 @@ async function init() {
       dom.submitLabel.textContent = 'Update';
       dom.removeBtn.style.display = 'inline-flex';
     } else {
-      // Default: Bookmarks Bar (id = '1')
+      // Try to guess the best folder from the page title, otherwise default to Bookmarks Bar
       selectedFolder =
+        findBestFolderForTitle(tab.title, allFolders) ??
         allFolders.find(f => f.id === '1') ??
         allFolders[0];
     }
@@ -105,10 +106,9 @@ async function init() {
     updateFolderDisplay();
     setupEventListeners();
 
-    // 8. Focus the title field
+    // 8. Focus the folder search field
     if (bookmarkable) {
-      dom.titleInput.focus();
-      dom.titleInput.select();
+      dom.folderInput.focus();
     }
 
   } catch (err) {
@@ -324,11 +324,8 @@ function setupEventListeners() {
   // ---- Folder input ----
 
   dom.folderInput.addEventListener('focus', () => {
-    // Clear the displayed folder name so typing starts fresh
-    if (dom.folderInput.value === selectedFolder?.title) {
-      dom.folderInput.value = '';
-    }
-    openDropdown(dom.folderInput.value);
+    // Select all text so typing immediately replaces it; dropdown stays closed until they type
+    dom.folderInput.select();
   });
 
   dom.folderInput.addEventListener('input', () => {
@@ -569,6 +566,69 @@ function escapeHtml(str) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+/**
+ * Try to find the best matching folder for a given page title.
+ * Returns null if no folder scores well enough to be a useful guess.
+ *
+ * Scoring tiers (lower = better):
+ *   1000s — folder name is a substring of the title (bonus for longer names)
+ *   2000s — a meaningful title word is a substring of the folder name (or vice-versa)
+ *   3000s — a meaningful title word fuzzy-matches the folder name
+ * Anything at Infinity is rejected.
+ */
+const TITLE_STOPWORDS = new Set([
+  'the','and','for','with','from','that','this','are','was','has','have',
+  'not','but','its','into','your','about','how','what','why','when',
+]);
+
+function findBestFolderForTitle(title, folders) {
+  if (!title || folders.length === 0) return null;
+
+  const titleLower = title.toLowerCase();
+
+  // Extract meaningful words (length >= 3, not stopwords)
+  const titleWords = titleLower
+    .replace(/[^\w\s]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length >= 3 && !TITLE_STOPWORDS.has(w));
+
+  let bestFolder = null;
+  let bestScore = Infinity;
+
+  for (const folder of folders) {
+    const fLower = folder.title.toLowerCase();
+    if (!fLower || fLower.length < 2) continue;
+
+    let score = Infinity;
+
+    // Tier 1: folder name is a substring of the page title
+    if (titleLower.includes(fLower)) {
+      score = Math.min(score, 1000 - fLower.length * 5);
+    }
+
+    // Tier 2 & 3: word-level matching
+    for (const word of titleWords) {
+      if (fLower.includes(word) || word.includes(fLower)) {
+        const overlap = Math.min(word.length, fLower.length);
+        score = Math.min(score, 2000 - overlap * 5);
+      } else {
+        const match = fuzzyMatch(fLower, word);
+        if (match.matched) {
+          score = Math.min(score, 3000 + fuzzyScore(match.indices));
+        }
+      }
+    }
+
+    if (score < bestScore) {
+      bestScore = score;
+      bestFolder = folder;
+    }
+  }
+
+  // Only return a guess if it's at least a tier-1 or strong tier-2 match
+  return bestScore < 2500 ? bestFolder : null;
 }
 
 /**
