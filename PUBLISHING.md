@@ -114,11 +114,17 @@ Navigate to each section in the left sidebar:
 Advanced Bookmarks replaces Chrome's default bookmark dialog with a faster,
 more powerful version — designed for people who actually organise their bookmarks.
 
-KEY FEATURE: Searchable folder picker
+KEY FEATURE: Fuzzy searchable folder picker
 Instead of scrolling through a flat list, just start typing. The folder
-dropdown instantly filters all your bookmark folders by name or full path,
-highlights matches, and shows breadcrumb trails so you always know where
-a folder lives.
+dropdown instantly filters all your bookmark folders using fuzzy search —
+find folders even with partial or out-of-order characters. Matches are
+highlighted and full breadcrumb trails show you exactly where each folder lives.
+
+SMART DEFAULTS:
+• The dialog guesses the best target folder from the page title, so the
+  right folder is pre-selected the moment you open it
+• The folder you most recently bookmarked into appears at the top of the
+  list, making repeat saves to the same folder instant
 
 OTHER FEATURES:
 • Edit existing bookmarks — the dialog auto-detects bookmarked pages and

@@ -8,7 +8,9 @@ A Chrome extension that replaces the default bookmark dialog with a fast, search
 
 ## Features
 
-- **Searchable folder dropdown** — filter folders by name or full path as you type
+- **Fuzzy search** — filter folders by name or full path as you type; fuzzy matching finds results even with partial or out-of-order characters
+- **Smart default folder** — auto-guesses the best matching folder from the page title so the right folder is pre-selected on open
+- **Recent folders first** — the folder you most recently bookmarked into appears at the top of the list
 - **Match highlighting** — matched characters are highlighted in the results
 - **Full path breadcrumbs** — shows `Bookmarks Bar › Work › Projects` under each result
 - **Keyboard navigation** — `↑ ↓` to move, `Enter` to select, `Esc` to dismiss
