@@ -1,222 +1,248 @@
-# Publishing to the Chrome Web Store
+# Shipping a release to the Chrome Web Store
 
-A complete guide from packaging to going live.
+Operational checklist for publishing a new version of Advanced Bookmarks. The
+account already exists and the item is already live, so this covers the update
+path only. First-time setup notes are at the bottom.
 
----
-
-## Overview
-
-```
-Build .zip  →  Pay $5 one-time fee  →  Upload to Dashboard
-→  Fill store listing  →  Submit for review  →  Published (1–3 days)
-```
-
-Chrome handles all cryptographic signing internally — you never sign a `.crx` yourself when publishing through the Web Store.
+**Dashboard:** <https://chrome.google.com/webstore/devconsole>
+**Item ID:** `lllhlboikkambnobbpjifhkpckiigdio`
 
 ---
 
-## Step 1 — Register a developer account
+## 0 — Context: what actually drives ranking
 
-1. Go to <https://chrome.google.com/webstore/devconsole>
-2. Sign in with a Google account
-3. Pay the **one-time $5 USD** registration fee (credit card required)
-4. Accept the Developer Agreement
+Worth keeping in mind while filling in the fields below, because it changes where
+the effort is worth spending. Per Google's
+[discoverability docs](https://developer.chrome.com/docs/webstore/discovery),
+store search ranks on listing metadata **plus** user ratings and usage statistics
+(installs versus uninstalls over time).
 
-> This fee is per Google account, not per extension. One account can publish unlimited extensions.
+At low install counts the metadata is the only lever you control, but it is not
+the dominant one — the flywheel only starts turning with installs and reviews
+coming from outside the store. So: fill the listing out completely (§4), then do
+§8. Skipping §8 makes the rest largely decorative.
 
 ---
 
-## Step 2 — Prepare assets
-
-### Required before submission
-
-| Asset | Spec | Notes |
-|---|---|---|
-| Extension `.zip` | All source files (no `.git`, no `scripts/`, no `Makefile`) | Run `make pack` |
-| Store icon | **128 × 128 px PNG** | Already in `icons/icon128.png` — you may want a higher-quality version |
-| Screenshot(s) | **1280 × 800 px** or **640 × 400 px** PNG or JPEG | At least 1 required; up to 5 |
-
-### Optional but strongly recommended
-
-| Asset | Spec |
-|---|---|
-| Small promo tile | 440 × 280 px PNG (shown in search results) |
-| Large promo tile | 920 × 680 px PNG (featured placement) |
-| YouTube demo video | Public YouTube URL |
-
-### Taking screenshots
-
-The easiest way to produce exact-size screenshots on macOS:
+## 1 — Pre-flight
 
 ```bash
-# Open Chrome with the popup visible, then:
-# Chrome DevTools → device toolbar → set to 1280×800 → screenshot
+make validate     # manifest, _locales key parity, name/summary length limits
 ```
 
-Or use a tool like [Pixelmator](https://www.pixelmator.com) / Figma / Canva to mock up the UI at the required resolution.
+Then walk the checklist:
 
----
+- [ ] `manifest.json` → `"version"` bumped (the store rejects a re-upload of an existing version)
+- [ ] `docs/index.html` → `softwareVersion` in the JSON-LD block matches
+- [ ] Every `_locales/<locale>/messages.json` carries the same keys (validate enforces this)
+- [ ] Every new UI string is translated in all 7 locales, not just `en`
+- [ ] `store-listing/<locale>.md` updated if any feature copy changed
+- [ ] `docs/privacy.html` → "Last updated" and version line still accurate
+- [ ] Loaded unpacked and clicked through: add, edit, remove, new folder, non-bookmarkable page (e.g. `chrome://extensions`)
+- [ ] Checked the popup in at least one non-English locale — see below
 
-## Step 3 — Package the extension
+### Testing a locale without changing your system language
+
+Launch a throwaway Chrome profile with a forced UI language:
 
 ```bash
-make pack
-```
-
-This creates `build/advanced-bookmarks.zip` containing only the files Chrome needs:
-
-```
-advanced-bookmarks.zip
-├── manifest.json
-├── popup.html
-├── popup.css
-├── popup.js
-└── icons/
-    ├── icon16.png
-    ├── icon48.png
-    └── icon128.png
-```
-
-Files excluded from the zip: `scripts/`, `Makefile`, `*.md`, `.git/`, `.DS_Store`.
-
-> **Do not submit a `.crx` file.** The Web Store requires a plain `.zip`. Chrome signs and packages it as `.crx` on their end.
-
----
-
-## Step 4 — Upload to the Developer Dashboard
-
-1. Go to <https://chrome.google.com/webstore/devconsole>
-2. Click **New item**
-3. Upload `build/advanced-bookmarks.zip`
-4. Chrome will parse the manifest and show a summary — fix any validation errors before continuing
-
----
-
-## Step 5 — Fill in the store listing
-
-Navigate to each section in the left sidebar:
-
-### Store listing
-
-| Field | Suggested value |
-|---|---|
-| **Name** | Advanced Bookmarks |
-| **Short description** (up to 132 chars) | Save bookmarks instantly with a searchable, filterable folder picker. |
-| **Detailed description** | See below |
-| **Category** | Productivity |
-| **Language** | English |
-| **Screenshots** | Upload the 1280×800 screenshots you prepared |
-| **Store icon** | Upload a higher-quality 128×128 icon if you have one |
-
-#### Suggested detailed description
-
-```
-Advanced Bookmarks replaces Chrome's default bookmark dialog with a faster,
-more powerful version — designed for people who actually organise their bookmarks.
-
-KEY FEATURE: Fuzzy searchable folder picker
-Instead of scrolling through a flat list, just start typing. The folder
-dropdown instantly filters all your bookmark folders using fuzzy search —
-find folders even with partial or out-of-order characters. Matches are
-highlighted and full breadcrumb trails show you exactly where each folder lives.
-
-SMART DEFAULTS:
-• The dialog guesses the best target folder from the page title, so the
-  right folder is pre-selected the moment you open it
-• The folder you most recently bookmarked into appears at the top of the
-  list, making repeat saves to the same folder instant
-
-OTHER FEATURES:
-• Edit existing bookmarks — the dialog auto-detects bookmarked pages and
-  pre-selects the current folder
-• Remove bookmarks directly from the dialog
-• Full keyboard navigation (↑↓ arrows, Enter, Escape)
-• Configurable keyboard shortcut (suggested: Alt+D)
-• No ads, no tracking, no external requests
-
-PERMISSIONS USED:
-• bookmarks — to read your folder tree and save/edit/remove bookmarks
-• tabs — to read the current page's URL and title (never sent anywhere)
-```
-
-### Privacy tab
-
-| Field | Value |
-|---|---|
-| **Single purpose** | Bookmark management |
-| **Does it handle user data?** | No (no data is collected or transmitted) |
-| **Privacy policy URL** | Required only if you collect data — leave blank or link to a simple page |
-
-> If you don't collect any data, you can state that in the privacy practices section without needing a dedicated privacy policy URL. However, some reviewers still ask for one. A one-page GitHub Pages site saying "This extension collects no data" is sufficient.
-
-### Distribution tab
-
-| Field | Value |
-|---|---|
-| **Visibility** | Public |
-| **Regions** | All regions (or restrict as needed) |
-| **Price** | Free |
-
----
-
-## Step 6 — Submit for review
-
-1. Click **Submit for review** (top-right of the dashboard)
-2. Confirm you comply with the [Chrome Web Store Developer Program Policies](https://developer.chrome.com/docs/webstore/program-policies/)
-3. Your extension enters the **Pending review** state
-
-### Review timeline
-
-| Scenario | Typical wait |
-|---|---|
-| First submission of a new extension | **3–7 business days** |
-| Update to an existing extension | **1–3 business days** |
-| Extensions with broad permissions | May take longer |
-
-You'll receive an email when the status changes.
-
-### Common rejection reasons (and fixes)
-
-| Rejection reason | Fix |
-|---|---|
-| "Single purpose not clear" | Tighten the store description to focus only on bookmarking |
-| "Permissions not justified" | Add a `"permissions"` explanation in the manifest or description |
-| "Screenshots don't show functionality" | Show the popup open with the folder dropdown visible |
-| "Privacy policy missing" | Add a simple one-paragraph policy page |
-
----
-
-## Step 7 — After publication
-
-- Your extension gets a permanent URL: `https://chromewebstore.google.com/detail/<id>`
-- Updates: bump `"version"` in `manifest.json`, run `make pack`, upload the new zip in the dashboard, submit for review again
-- Respond to user reviews regularly — it helps ranking
-
----
-
-## About signing (.crx) for self-distribution
-
-If you want to distribute the extension **outside** the Chrome Web Store (e.g. via your own website or enterprise deployment), you need to create and sign a `.crx` file yourself:
-
-```bash
-# Chrome can pack and sign a .crx from the command line:
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
-  --pack-extension=/path/to/extension \
-  --pack-extension-key=/path/to/key.pem
+  --user-data-dir=/tmp/ab-locale-test --lang=fr
 ```
 
-- On first run (no `--pack-extension-key`), Chrome generates a `key.pem` alongside the `.crx` — **keep this file safe and private**. It's your extension's permanent identity.
-- For subsequent updates you must use the same `key.pem` or Chrome will treat it as a different extension.
-- Self-distributed `.crx` files are blocked by Chrome on Windows/macOS unless deployed via enterprise policy (Group Policy / MDM). The Web Store is the practical path for public distribution.
-
-> **Summary:** For public distribution → use the Web Store (Chrome signs it for you). For internal/enterprise → use `--pack-extension` with a `.pem` key + enterprise policy deployment.
+Then load the unpacked extension in that window. `chrome.i18n` follows the
+browser UI language, so the popup should come up fully translated.
 
 ---
 
-## Useful links
+## 2 — Regenerate assets (only if they changed)
 
-- [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole)
-- [Developer Program Policies](https://developer.chrome.com/docs/webstore/program-policies/)
-- [Publishing guide (official)](https://developer.chrome.com/docs/webstore/publish/)
-- [MV3 migration notes](https://developer.chrome.com/docs/extensions/develop/migrate)
-- [Extension review process](https://developer.chrome.com/docs/webstore/review-process/)
+```bash
+make icons     # PNG icons
+make promo     # promo/tile-small-440x280.png + promo/tile-marquee-1400x560.png
+```
+
+`make promo` renders `promo/*.html` through headless Chrome. To iterate on the
+design, open those HTML files directly in a browser, edit, then re-run.
+
+---
+
+## 3 — Package and upload
+
+```bash
+make pack      # runs icons + validate, then builds build/advanced-bookmarks.zip
+```
+
+Confirm the zip contains **only** runtime files — `manifest.json`, `popup.*`,
+`icons/`, `_locales/`. It should be ~20 KiB. If it is hundreds of KiB, something
+from `screenshots/`, `docs/` or `promo/` leaked in; check `ZIP_EXCLUDES` in the
+Makefile.
+
+Then, in the dashboard: **select the item → Package → Upload new package →**
+upload `build/advanced-bookmarks.zip`.
+
+> Upload the package **before** touching the listing text. The language selector
+> on the Store listing tab only offers languages that the uploaded package
+> declares under `_locales/`, so a fresh upload is what unlocks the six
+> non-English tabs.
+
+---
+
+## 4 — Store listing, per language
+
+The **Store listing** tab has a language dropdown at the top. Do English first,
+then each other locale.
+
+| Field | Where it comes from |
+|---|---|
+| Name | `_locales/<locale>/messages.json` → `extName` — automatic, read-only in the dashboard |
+| Summary | `_locales/<locale>/messages.json` → `extDescription` — automatic |
+| **Detailed description** | **paste by hand** from `store-listing/<locale>.md` |
+| **Screenshots** | **upload per language** (the same 1280×800 files are fine) |
+
+So per locale the manual work is: switch language → paste the description →
+attach screenshots → save.
+
+### Fields that are global (set once, on any language tab)
+
+| Field | Value |
+|---|---|
+| Category | **Tools** — keep it there; a bookmark dialog is a utility, not a planning app |
+| Store icon | `icons/icon128.png` |
+| Small promo tile | `promo/tile-small-440x280.png` |
+| Marquee promo tile | `promo/tile-marquee-1400x560.png` |
+| Website | `https://bcollard.github.io/chrome-advanced-bookmarks/` |
+| Support URL | `https://github.com/bcollard/chrome-advanced-bookmarks/issues` |
+
+### Screenshots
+
+Five max, 1280×800, no padding, square corners. Order matters — the first one is
+the thumbnail. Lead with the dropdown open mid-search, since that is the one
+thing the listing has to communicate in a single glance.
+
+Source files live in `screenshots/`. `make resize-screenshots` normalizes new
+captures to 1280×800.
+
+### Copy rules the descriptions already follow
+
+Do not "improve" them into a policy violation. Per the
+[listing guidelines](https://developer.chrome.com/docs/webstore/best-listing):
+
+- Summary: plain text, ≤132 chars, no HTML — `make validate` checks this
+- No superlatives ("fastest", "best"), no generic praise, no naming competitors
+- No repeated keywords — keyword spam is grounds for **suspension**, not just rejection
+
+---
+
+## 5 — Privacy tab
+
+Unchanged release to release, but re-confirm it every time — a blank field here
+blocks submission.
+
+| Field | Value |
+|---|---|
+| Single purpose | Bookmark management: saving and organizing bookmarks into folders |
+| `bookmarks` justification | Read the user's folder tree to make it searchable, and create, update, move or delete bookmarks on request |
+| `tabs` justification | Read the active tab's title and URL to pre-fill the bookmark form |
+| Remote code | **No** — all code is in the package |
+| Data collection | **None** — tick every "does not collect" box |
+| Privacy policy URL | `https://bcollard.github.io/chrome-advanced-bookmarks/privacy.html` |
+
+Then tick the three data-usage compliance certifications at the bottom.
+
+---
+
+## 6 — Submit
+
+**Submit for review**, top right. Reviews for an update on an existing item
+typically land in 1–3 business days; a change of name or category can push it
+longer since it gets a fuller pass.
+
+You can choose to **publish immediately on approval** or hold it. Holding is
+useful if you want the launch posts in §8 to go out the same day the new listing
+goes live.
+
+### If it gets rejected
+
+| Reason given | What it usually means here |
+|---|---|
+| "Single purpose not clear" | The description drifted into unrelated features — trim back to bookmarking |
+| "Permissions not justified" | The §5 justification text no longer matches the manifest |
+| "Keyword spam" | A target term got repeated across name + summary + description; thin it out |
+| "Screenshots don't reflect functionality" | Re-shoot with the folder dropdown open and results visible |
+| "Metadata inconsistent across locales" | A translation promises a feature the English one doesn't (or vice versa) |
+
+Fix, then resubmit — the review clock restarts.
+
+---
+
+## 7 — After it goes live
+
+- [ ] Tag the release: `git tag v1.2.0 && git push --tags`
+- [ ] Enable GitHub Pages if not already on: repo **Settings → Pages → Source: `main` / `/docs`**
+- [ ] Load the live listing in an incognito window and read it as a stranger would
+- [ ] Check the listing in French and Japanese (`?hl=fr`, `?hl=ja`) — confirm the translations actually took
+- [ ] Submit the landing page to [Google Search Console](https://search.google.com/search-console) and request indexing
+
+---
+
+## 8 — Distribution (the part that moves the needle)
+
+Ranking follows installs; installs do not follow ranking when you are starting
+near zero. This section is the actual growth work — treat it as part of the
+release, not as optional follow-up.
+
+**Launch day**
+
+- [ ] **Show HN** — the fuzzy-folder-search angle is the hook, not "a bookmark manager". Link the GitHub repo, not the store
+- [ ] **Product Hunt** — schedule for 00:01 PT
+- [ ] **Reddit** — r/chrome, r/productivity, r/browsers. Read each sub's self-promotion rule first; lead with the problem, not the product
+
+**Ongoing**
+
+- [ ] Make the GitHub repo public with topics: `chrome-extension`, `bookmarks`, `fuzzy-search`, `manifest-v3`, `productivity`
+- [ ] List it on [alternativeto.net](https://alternativeto.net)
+- [ ] Answer existing Reddit / Super User / Stack Exchange questions about picking bookmark folders quickly — these keep sending traffic for years
+- [ ] Ask early users for a review. Zero ratings is a hard ceiling on store ranking, and the first handful matter disproportionately
+- [ ] Ship something small every couple of months. "Last updated" is a freshness signal, and a stale item drifts down
+
+**Measuring it**
+
+The dashboard's stats tab gives installs, uninstalls and weekly users. Uninstall
+rate is the number that feeds ranking most directly — if it climbs after a
+release, the onboarding regressed, not the marketing.
+
+---
+
+## Appendix A — First-time setup (already done)
+
+Kept for reference:
+
+1. Register at <https://chrome.google.com/webstore/devconsole> — one-time **$5 USD** fee, per Google account, unlimited items
+2. Accept the Developer Agreement
+3. **New item** → upload the zip → fill listing → submit
+4. First review of a brand-new item runs longer than an update: 3–7 business days
+
+Chrome signs and packages the `.crx` on their end. Never upload a `.crx` — the
+store only accepts a plain `.zip`.
+
+## Appendix B — Self-distribution outside the store
+
+Only relevant for enterprise or local installs.
+
+```bash
+make sign      # wraps Chrome's --pack-extension
+```
+
+- On first run Chrome generates `build/advanced-bookmarks.pem`. **Keep it.** It is the extension's permanent identity; a different key means a different extension to Chrome
+- Self-distributed `.crx` files are blocked on Windows and macOS unless deployed through enterprise policy (Group Policy / MDM)
+- For public distribution the Web Store is the only practical route
+
+## Appendix C — Links
+
+- [Developer Dashboard](https://chrome.google.com/webstore/devconsole)
+- [Best practices for listings](https://developer.chrome.com/docs/webstore/best-listing)
+- [Discoverability and search ranking](https://developer.chrome.com/docs/webstore/discovery)
+- [Program policies](https://developer.chrome.com/docs/webstore/program-policies/)
+- [Review process](https://developer.chrome.com/docs/webstore/review-process/)
+- [Internationalization (`chrome.i18n`)](https://developer.chrome.com/docs/extensions/reference/api/i18n)

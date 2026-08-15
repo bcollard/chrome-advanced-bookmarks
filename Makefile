@@ -6,16 +6,21 @@ EXTENSION_NAME := advanced-bookmarks
 BUILD_DIR      := build
 ZIP_FILE       := $(BUILD_DIR)/$(EXTENSION_NAME).zip
 
-# Files/dirs to exclude from the distribution zip
+# Files/dirs to exclude from the distribution zip.
+# Everything that is listing material or tooling — never shipped to users.
 ZIP_EXCLUDES := \
-	"*.git*"          \
-	"$(BUILD_DIR)/*"  \
-	"scripts/*"       \
-	"*.md"            \
-	"Makefile"        \
-	".DS_Store"       \
-	"*.crx"           \
-	"*.pem"           \
+	"*.git*"           \
+	"$(BUILD_DIR)/*"   \
+	"scripts/*"        \
+	"docs/*"           \
+	"promo/*"          \
+	"store-listing/*"  \
+	"screenshots/*"    \
+	"*.md"             \
+	"Makefile"         \
+	".DS_Store"        \
+	"*.crx"            \
+	"*.pem"            \
 	".claude/*"
 
 .DEFAULT_GOAL := help
@@ -35,8 +40,19 @@ icons:               ## Regenerate PNG icons (requires Python 3)
 
 # ────────────────────────────────────────
 .PHONY: validate
-validate:            ## Validate manifest.json and check all referenced files exist
+validate:            ## Validate manifest, _locales parity and store listing limits
 	python3 scripts/validate.py
+
+# ────────────────────────────────────────
+.PHONY: promo
+promo:               ## Render the store promo tiles (440x280 + 1400x560) from promo/*.html
+	python3 scripts/generate-promo-tiles.py
+
+# ────────────────────────────────────────
+.PHONY: site
+site:                ## Preview the GitHub Pages landing page at http://localhost:8000
+	@echo "Serving docs/ at http://localhost:8000 — Ctrl+C to stop"
+	@python3 -m http.server 8000 --directory docs
 
 # ────────────────────────────────────────
 .PHONY: pack
