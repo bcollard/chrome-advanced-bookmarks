@@ -96,8 +96,24 @@
   <p>
     The extension is open source under the MIT license and is a few hundred lines of
     dependency-free vanilla JavaScript. You can read every line of it at
-    <a href="https://github.com/bcollard/chrome-advanced-bookmarks">github.com/bcollard/chrome-advanced-bookmarks</a>,
-    and compare it against the packaged extension in <code>chrome://extensions</code>.
+    <a href="https://github.com/bcollard/chrome-advanced-bookmarks">github.com/bcollard/chrome-advanced-bookmarks</a>.
+  </p>
+  <p>
+    You also do not have to take on faith that the source you are reading is the code
+    you installed. Every release is built by GitHub Actions from a tag and carries a
+    signed build provenance attestation, and the build is reproducible, so the
+    published artifact can be checked against the source byte for byte:
+  </p>
+  <pre style="background:rgba(128,128,128,.13);border-radius:8px;padding:14px 16px;overflow-x:auto;font-size:14px;line-height:1.7"><code>gh attestation verify advanced-bookmarks-1.2.0.zip \
+   --repo bcollard/chrome-advanced-bookmarks
+
+python3 scripts/verify-reproducible.py advanced-bookmarks-1.2.0.zip</code></pre>
+  <p>
+    Full instructions are on the
+    <a href="./#verify">landing page</a>. This matters because the Chrome Web Store
+    signs the <code>.crx</code> itself from a <code>.zip</code> the developer uploads:
+    without reproducibility and attestation, nothing links the bytes you install to a
+    commit.
   </p>
 
   <h2>Changes to this policy</h2>

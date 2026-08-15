@@ -48,7 +48,8 @@
     "Full keyboard navigation",
     "Create a new folder without leaving the dialog",
     "Edit or remove an existing bookmark",
-    "No tracking and no external requests"
+    "No tracking and no external requests",
+    "Reproducible builds with signed provenance attestation"
   ],
   "author": { "@type": "Person", "name": "Baptiste Collard", "url": "https://github.com/bcollard" },
   "codeRepository": "https://github.com/bcollard/chrome-advanced-bookmarks"
@@ -82,6 +83,14 @@
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "No. The extension makes no network requests at all. It reads the active tab's URL and title only to pre-fill the dialog, and nothing ever leaves your browser."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How can I verify the extension I installed was built from the published source?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Every release is built by GitHub Actions from a tag and carries a signed build provenance attestation, verifiable with: gh attestation verify advanced-bookmarks-1.2.0.zip --repo bcollard/chrome-advanced-bookmarks. The build is also reproducible, so you can rebuild it and compare byte for byte with: python3 scripts/verify-reproducible.py advanced-bookmarks-1.2.0.zip. Any Python 3 on any operating system produces identical bytes, because the archive stores its entries rather than compressing them."
       }
     },
     {
@@ -242,6 +251,45 @@
   }
   .shots figcaption { margin-top: 10px; font-size: 14.5px; color: var(--muted) }
 
+  /* ── Verify ───────────────────────────────────────────── */
+  .verify-step { margin-bottom: 30px }
+  .verify-step:last-child { margin-bottom: 0 }
+  .verify-step h3 {
+    margin: 0 0 9px; font-size: 17.5px; letter-spacing: -.01em;
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  .verify-step h3 .n {
+    flex: none; width: 23px; height: 23px; border-radius: 50%;
+    background: var(--blue); color: #fff;
+    font-size: 13px; font-weight: 700; line-height: 23px; text-align: center;
+    align-self: center;
+  }
+  .verify-step > p { margin: 0 0 13px; color: var(--muted); font-size: 15.5px; max-width: 72ch }
+  .verify-step > p:last-child { margin: 11px 0 0 }
+
+  pre.cmd {
+    margin: 0;
+    background: #0f1720;
+    color: #dfe6ee;
+    border-radius: 10px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font: 14px/1.75 "SF Mono", Menlo, Consolas, monospace;
+    -webkit-font-smoothing: auto;
+  }
+  pre.cmd .p { color: #6f8296; user-select: none }
+  pre.cmd .c { color: #7fd18e }
+
+  .verify-note {
+    margin-top: 30px; padding: 17px 19px;
+    border-left: 3px solid var(--blue);
+    background: rgba(26, 115, 232, .07);
+    border-radius: 0 9px 9px 0;
+    font-size: 15.5px; line-height: 1.6;
+  }
+  .verify-note p { margin: 0; color: var(--ink) }
+  .verify-note p + p { margin-top: 10px }
+
   /* ── FAQ ──────────────────────────────────────────────── */
   details {
     border-bottom: 1px solid var(--line);
@@ -299,7 +347,7 @@
       </div>
 
       <p class="hero-note">
-        MIT licensed · Manifest V3 · no tracking, no network requests, no account
+        MIT licensed · Manifest V3 · reproducible, attested builds · no tracking, no account
       </p>
     </div>
 
@@ -423,7 +471,64 @@
   </div>
 </section>
 
-<section class="alt">
+<section class="alt" id="verify">
+  <div class="wrap">
+    <h2>Verify what you installed</h2>
+    <p class="sub">
+      You do not have to trust that the extension on the Web Store was built from
+      the code in this repository. You can check it, in about a minute.
+    </p>
+
+    <div class="verify-step">
+      <h3><span class="n">1</span> Confirm where the artifact came from</h3>
+      <p>
+        Every release is built by GitHub Actions from a tag and carries a signed
+        build provenance attestation binding it to this repository, the commit and
+        the workflow run.
+      </p>
+      <pre class="cmd"><span class="p">$</span> gh release download v1.2.0 --repo bcollard/chrome-advanced-bookmarks
+<span class="p">$</span> gh attestation verify advanced-bookmarks-1.2.0.zip \
+     --repo bcollard/chrome-advanced-bookmarks</pre>
+    </div>
+
+    <div class="verify-step">
+      <h3><span class="n">2</span> Confirm it matches the source</h3>
+      <p>
+        The build is reproducible, so you can rebuild it yourself and compare byte
+        for byte.
+      </p>
+      <pre class="cmd"><span class="p">$</span> git clone https://github.com/bcollard/chrome-advanced-bookmarks.git
+<span class="p">$</span> cd chrome-advanced-bookmarks &amp;&amp; git checkout v1.2.0
+<span class="p">$</span> python3 scripts/verify-reproducible.py advanced-bookmarks-1.2.0.zip
+
+<span class="c">OK: identical — the published artifact was built from this source</span></pre>
+      <p>
+        Any Python 3 on any OS produces the same bytes. The archive stores its
+        entries rather than compressing them, so no compressor build and no
+        interpreter version is part of the contract — a mismatch means the contents
+        genuinely differ, not that your toolchain differs from the one CI used.
+      </p>
+    </div>
+
+    <div class="verify-note">
+      <p>
+        <strong>Why this is worth doing.</strong> The Chrome Web Store signs the
+        <code>.crx</code> itself, from a <code>.zip</code> the developer uploads. The
+        developer never signs anything, and nothing links the bytes you install to a
+        commit — so "the source is on GitHub" is normally an assertion you have to
+        take on faith.
+      </p>
+      <p>
+        Reproducibility plus attestation is what turns it into something checkable.
+        It helps that there is no build step to reason about: the extension is
+        unbundled, dependency-free vanilla JavaScript, so the code in the archive is
+        the code in the repository.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
   <div class="wrap">
     <h2>Questions</h2>
 
@@ -452,10 +557,11 @@
     <details>
       <summary>Does it collect anything?</summary>
       <p>
-        No. There is no service worker, no analytics and no network code of any kind —
-        you can verify that in the
-        <a href="https://github.com/bcollard/chrome-advanced-bookmarks">source</a>, which
-        is a few hundred lines of dependency-free vanilla JavaScript. See the
+        No. There is no service worker, no analytics and no network code of any kind.
+        The <a href="https://github.com/bcollard/chrome-advanced-bookmarks">source</a>
+        is a few hundred lines of dependency-free vanilla JavaScript, and you do not
+        have to take on faith that it is what you installed — the published build is
+        <a href="#verify">reproducible and attested</a>. See also the
         <a href="privacy.html">privacy policy</a>.
       </p>
     </details>
