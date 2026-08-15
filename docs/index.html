@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Advanced Bookmarks — fuzzy folder search for Chrome bookmarks</title>
+<meta name="description" content="A Chrome extension that replaces the default bookmark dialog with a fuzzy-searchable folder picker. Type a few letters to find any nested bookmark folder and save the page — no scrolling, fully keyboard-driven.">
+<link rel="canonical" href="https://bcollard.github.io/chrome-advanced-bookmarks/">
+<link rel="icon" href="img/icon128.png" type="image/png">
+
+<!-- Open Graph / social -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Advanced Bookmarks — fuzzy folder search for Chrome bookmarks">
+<meta property="og:description" content="Type a few letters to find any nested bookmark folder and save the page. Free, open source, no tracking.">
+<meta property="og:url" content="https://bcollard.github.io/chrome-advanced-bookmarks/">
+<meta property="og:image" content="https://bcollard.github.io/chrome-advanced-bookmarks/img/fuzzy-folder-search.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<!--
+  Structured data. This is what lets the page show up as a rich result for
+  queries like "fuzzy search bookmark chrome extension" — the Web Store
+  listing itself cannot carry it.
+-->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Advanced Bookmarks – Fuzzy Folder Search",
+  "applicationCategory": "BrowserApplication",
+  "applicationSubCategory": "Chrome Extension",
+  "operatingSystem": "Chrome, Edge, Brave, Chromium",
+  "url": "https://bcollard.github.io/chrome-advanced-bookmarks/",
+  "downloadUrl": "https://chromewebstore.google.com/detail/advanced-bookmarks/lllhlboikkambnobbpjifhkpckiigdio",
+  "installUrl": "https://chromewebstore.google.com/detail/advanced-bookmarks/lllhlboikkambnobbpjifhkpckiigdio",
+  "softwareVersion": "1.2.0",
+  "image": "https://bcollard.github.io/chrome-advanced-bookmarks/img/fuzzy-folder-search.png",
+  "screenshot": "https://bcollard.github.io/chrome-advanced-bookmarks/img/fuzzy-folder-search.png",
+  "description": "A Chrome extension that replaces the default bookmark dialog with a fuzzy-searchable folder picker. Type a few letters to find any nested bookmark folder and save the page instantly.",
+  "license": "https://opensource.org/licenses/MIT",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "featureList": [
+    "Fuzzy search across bookmark folder names and full paths",
+    "Smart default folder guessed from the page title",
+    "Most recently used folder surfaced first",
+    "Match highlighting and breadcrumb paths",
+    "Full keyboard navigation",
+    "Create a new folder without leaving the dialog",
+    "Edit or remove an existing bookmark",
+    "No tracking and no external requests"
+  ],
+  "author": { "@type": "Person", "name": "Baptiste Collard", "url": "https://github.com/bcollard" },
+  "codeRepository": "https://github.com/bcollard/chrome-advanced-bookmarks"
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is fuzzy search for bookmark folders?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Fuzzy search matches a folder even when you type only some of its letters, out of order or with gaps. Typing \"wpr\" finds \"Work Projects\" and \"WordPress\". Advanced Bookmarks applies this to both the folder name and its full path, so you never scroll a long dropdown again."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I replace Chrome's Ctrl+D bookmark dialog?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Chrome reserves Ctrl+D at the browser level and extensions cannot override it. Advanced Bookmarks binds to Alt+D by default, and you can change it to any free combination at chrome://extensions/shortcuts."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does Advanced Bookmarks collect any data?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. The extension makes no network requests at all. It reads the active tab's URL and title only to pre-fill the dialog, and nothing ever leaves your browser."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does it work in Edge, Brave and other Chromium browsers?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. It is a standard Manifest V3 extension using only the bookmarks and tabs APIs, so it runs in any Chromium-based browser that can install extensions from the Chrome Web Store."
+      }
+    }
+  ]
+}
+</script>
+
+<style>
+  :root {
+    --blue:   #1a73e8;
+    --blue-d: #0b3d91;
+    --ink:    #16181d;
+    --muted:  #5f6368;
+    --line:   #e3e6ea;
+    --bg:     #ffffff;
+    --bg-alt: #f6f8fb;
+    --amber:  #b26a00;
+    --hl:     #1a73e8;
+    --hl-bg:  rgba(255, 216, 107, .45);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink:    #e8eaed;
+      --muted:  #9aa0a6;
+      --line:   #2c3138;
+      --bg:     #121417;
+      --bg-alt: #191c21;
+      --amber:  #ffd86b;
+      --hl:     #ffd86b;
+      --hl-bg:  rgba(255, 216, 107, .14);
+    }
+  }
+
+  * { box-sizing: border-box }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 17px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 940px; margin: 0 auto; padding: 0 24px }
+
+  a { color: var(--blue); text-decoration: none }
+  a:hover { text-decoration: underline }
+
+  /* ── Hero ─────────────────────────────────────────────── */
+  .hero {
+    background: radial-gradient(90% 130% at 82% 0%, #4c8dff 0%, var(--blue) 42%, var(--blue-d) 100%);
+    color: #fff;
+    padding: 76px 0 84px;
+  }
+  .hero .wrap { display: grid; gap: 44px; grid-template-columns: 1fr }
+  @media (min-width: 860px) { .hero .wrap { grid-template-columns: 1.05fr .95fr; align-items: center } }
+
+  .eyebrow {
+    display: flex; align-items: center; gap: 11px;
+    font-size: 14px; font-weight: 600; letter-spacing: .1em;
+    text-transform: uppercase; opacity: .85; margin-bottom: 22px;
+  }
+
+  .hero h1 {
+    margin: 0;
+    font-size: clamp(34px, 5.6vw, 54px);
+    line-height: 1.08;
+    letter-spacing: -.025em;
+    font-weight: 800;
+  }
+  .hero h1 em { font-style: normal; color: #ffd86b }
+
+  .hero .lede { margin: 20px 0 0; font-size: 20px; line-height: 1.5; opacity: .94 }
+
+  .cta { display: flex; flex-wrap: wrap; gap: 13px; margin-top: 30px }
+  .btn {
+    display: inline-flex; align-items: center; gap: 9px;
+    padding: 13px 22px; border-radius: 10px;
+    font-weight: 600; font-size: 16px; text-decoration: none;
+  }
+  .btn--primary { background: #fff; color: var(--blue-d) }
+  .btn--ghost   { background: rgba(255,255,255,.13); color: #fff; border: 1px solid rgba(255,255,255,.38) }
+  .btn:hover { text-decoration: none; filter: brightness(.96) }
+
+  .hero-note { margin-top: 18px; font-size: 14px; opacity: .78 }
+
+  .hero img {
+    width: 100%; max-width: 420px; height: auto; display: block; margin-inline: auto;
+    border-radius: 14px;
+    box-shadow: 0 26px 60px rgba(4, 26, 62, .42);
+  }
+
+  /* ── Sections ─────────────────────────────────────────── */
+  section { padding: 68px 0 }
+  section.alt { background: var(--bg-alt); border-block: 1px solid var(--line) }
+
+  h2 {
+    margin: 0 0 10px;
+    font-size: clamp(26px, 3.4vw, 34px);
+    letter-spacing: -.02em;
+    line-height: 1.2;
+  }
+  .sub { margin: 0 0 34px; color: var(--muted); font-size: 18px; max-width: 62ch }
+
+  /* ── The "why" demo strip ─────────────────────────────── */
+  .demo {
+    display: grid; gap: 18px; grid-template-columns: 1fr;
+    background: var(--bg); border: 1px solid var(--line);
+    border-radius: 14px; padding: 24px; margin-top: 8px;
+  }
+  @media (min-width: 720px) { .demo { grid-template-columns: auto 1fr; align-items: center; gap: 30px } }
+
+  .keys { display: flex; align-items: center; gap: 8px; flex-wrap: wrap }
+  kbd {
+    font: 600 14px/1 "SF Mono", Menlo, Consolas, monospace;
+    background: var(--bg-alt); border: 1px solid var(--line);
+    border-bottom-width: 2px; border-radius: 6px; padding: 7px 10px;
+    color: var(--ink);
+  }
+  .demo-list { margin: 0; padding: 0; list-style: none; font: 15px/1.9 "SF Mono", Menlo, Consolas, monospace }
+  .demo-list b { color: var(--hl); background: var(--hl-bg); border-radius: 3px; padding: 0 2px }
+  .demo-list .path { color: var(--muted) }
+
+  /* ── Feature grid ─────────────────────────────────────── */
+  .grid { display: grid; gap: 22px; grid-template-columns: 1fr }
+  @media (min-width: 640px) { .grid { grid-template-columns: 1fr 1fr } }
+  @media (min-width: 940px) { .grid { grid-template-columns: repeat(3, 1fr) } }
+
+  .card {
+    background: var(--bg); border: 1px solid var(--line);
+    border-radius: 13px; padding: 22px 22px 24px;
+  }
+  section.alt .card { background: var(--bg) }
+  .card h3 { margin: 0 0 7px; font-size: 17px; letter-spacing: -.01em }
+  .card p  { margin: 0; color: var(--muted); font-size: 15.5px; line-height: 1.6 }
+  .card .ico {
+    width: 34px; height: 34px; border-radius: 9px; margin-bottom: 14px;
+    display: grid; place-items: center;
+    background: rgba(26, 115, 232, .12); color: var(--blue);
+  }
+
+  /* ── Screenshot strip ─────────────────────────────────── */
+  .shots { display: grid; gap: 22px; grid-template-columns: 1fr }
+  @media (min-width: 760px) { .shots { grid-template-columns: 1fr 1fr } }
+  .shots figure { margin: 0 }
+  .shots img {
+    width: 100%; height: auto; display: block;
+    border: 1px solid var(--line); border-radius: 12px;
+  }
+  .shots figcaption { margin-top: 10px; font-size: 14.5px; color: var(--muted) }
+
+  /* ── FAQ ──────────────────────────────────────────────── */
+  details {
+    border-bottom: 1px solid var(--line);
+    padding: 17px 0;
+  }
+  details summary {
+    cursor: pointer; font-weight: 600; font-size: 17px;
+    list-style: none; display: flex; justify-content: space-between; gap: 16px;
+  }
+  details summary::-webkit-details-marker { display: none }
+  details summary::after { content: "+"; color: var(--muted); font-weight: 400; font-size: 22px; line-height: 1 }
+  details[open] summary::after { content: "−" }
+  details p { margin: 12px 0 0; color: var(--muted); max-width: 74ch }
+
+  /* ── Footer ───────────────────────────────────────────── */
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 34px 0 54px;
+    color: var(--muted); font-size: 14.5px;
+  }
+  footer .links { display: flex; flex-wrap: wrap; gap: 18px; margin-bottom: 14px }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+        </svg>
+        Advanced Bookmarks
+      </div>
+
+      <h1>Find any bookmark folder in <em>three keystrokes</em></h1>
+
+      <p class="lede">
+        Chrome's bookmark dialog makes you scroll a flat list of every folder you own.
+        This one lets you type. Fuzzy search matches folder names <em>and</em> full
+        paths, anywhere in the tree.
+      </p>
+
+      <div class="cta">
+        <a class="btn btn--primary"
+           href="https://chromewebstore.google.com/detail/advanced-bookmarks/lllhlboikkambnobbpjifhkpckiigdio">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+          </svg>
+          Add to Chrome — free
+        </a>
+        <a class="btn btn--ghost" href="https://github.com/bcollard/chrome-advanced-bookmarks">
+          View source on GitHub
+        </a>
+      </div>
+
+      <p class="hero-note">
+        MIT licensed · Manifest V3 · no tracking, no network requests, no account
+      </p>
+    </div>
+
+    <div>
+      <img src="img/fuzzy-folder-search.png"
+           width="660" height="800"
+           alt="The Advanced Bookmarks dialog: typing “blo” in the Folder field instantly filters the bookmark tree down to blog, blog-internal and bloh, with matched letters highlighted and each folder's full path shown underneath.">
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2>Type what you remember, not where you filed it</h2>
+    <p class="sub">
+      Fuzzy matching means the letters you type only have to appear in order — not
+      consecutively, and not from the start. Three characters are usually enough to
+      isolate one folder out of hundreds.
+    </p>
+
+    <div class="demo">
+      <div class="keys">
+        <kbd>Alt</kbd><kbd>D</kbd><span>→</span><kbd>w</kbd><kbd>p</kbd><kbd>r</kbd><span>→</span><kbd>Enter</kbd>
+      </div>
+      <ul class="demo-list">
+        <li><b>W</b>ork <b>Pr</b>ojects <span class="path">— Bookmarks Bar › Work</span></li>
+        <li><b>W</b>eekly <b>Pr</b>ep <span class="path">— Bookmarks Bar › Team › Rituals</span></li>
+        <li><b>W</b>ord<b>Pr</b>ess <span class="path">— Bookmarks Bar › Dev › CMS</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <h2>What it does</h2>
+    <p class="sub">Everything happens in one small dialog, without leaving the keyboard.</p>
+
+    <div class="grid">
+      <div class="card">
+        <div class="ico">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M15.5 14h-.79l-.28-.27a6.47 6.47 0 001.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.51 6.51 0 00-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.47 6.47 0 005.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+          </svg>
+        </div>
+        <h3>Fuzzy folder search</h3>
+        <p>Filters on the folder name and on its full breadcrumb path, so <code>dev/front</code> and <code>dvfr</code> both land on the same folder. Matched characters are highlighted.</p>
+      </div>
+
+      <div class="card">
+        <div class="ico">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4-6.2-4.6-6.2 4.6 2.4-7.4L2 9.4h7.6z"/>
+          </svg>
+        </div>
+        <h3>Smart default folder</h3>
+        <p>The dialog reads the page title and pre-selects the folder that matches it best. For pages you file repeatedly, the right folder is already there when the popup opens.</p>
+      </div>
+
+      <div class="card">
+        <div class="ico">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M13 3a9 9 0 00-9 9H1l3.9 3.9.1.1L9 12H6a7 7 0 117 7 6.9 6.9 0 01-4.9-2l-1.4 1.4A9 9 0 1013 3z"/>
+            <path d="M12 8v5l4.3 2.5.7-1.2-3.5-2.1V8z"/>
+          </svg>
+        </div>
+        <h3>Recent folders first</h3>
+        <p>The folder you last bookmarked into is ranked to the top of the list, which makes a run of saves into the same folder a single keystroke each.</p>
+      </div>
+
+      <div class="card">
+        <div class="ico">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M20 5H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zM11 8h2v2h-2V8zM8 8h2v2H8V8zM5 8h2v2H5V8zm3 5h8v2H8v-2zm-3-2h2v2H5v-2zm9-3h2v2h-2V8zm3 0h2v2h-2V8zm0 3h2v2h-2v-2z"/>
+          </svg>
+        </div>
+        <h3>Keyboard first</h3>
+        <p>Open with your own shortcut, arrow through results, <kbd>Enter</kbd> to save, <kbd>Esc</kbd> to back out. The folder field takes focus on open, so you can start typing immediately.</p>
+      </div>
+
+      <div class="card">
+        <div class="ico">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-1 8h-3v3h-2v-3h-3v-2h3V9h2v3h3v2z"/>
+          </svg>
+        </div>
+        <h3>New folders inline</h3>
+        <p>If nothing matches, create the folder from the same dialog — pick its parent from the full tree and it becomes the target for the bookmark you are saving.</p>
+      </div>
+
+      <div class="card">
+        <div class="ico">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 15l-4-4 1.41-1.41L11 13.17l5.59-5.58L18 9l-7 7z"/>
+          </svg>
+        </div>
+        <h3>Nothing leaves the browser</h3>
+        <p>Two permissions, both required to do the job: <code>bookmarks</code> to read and write the tree, <code>tabs</code> to read the current page's title and URL. No host permissions, no analytics, no network calls.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>In use</h2>
+    <p class="sub">The whole extension is one dialog. Here it is doing the three things it does.</p>
+
+    <div class="shots">
+      <figure>
+        <img src="img/auto-filled-dialog.png" width="880" height="800"
+             alt="The dialog pre-filled with a long GitHub page title and URL, with “prom” typed into the folder field narrowing the tree to a single matching folder.">
+        <figcaption>Name and URL come pre-filled from the tab. Type in the folder field to narrow the tree.</figcaption>
+      </figure>
+      <figure>
+        <img src="img/new-folder-dialog.png" width="860" height="800"
+             alt="The New folder dialog, with a name field and a Location dropdown listing every existing folder by its full path.">
+        <figcaption>No match? Create the folder inline and pick its parent from the full path list.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <h2>Questions</h2>
+
+    <details open>
+      <summary>What exactly is "fuzzy search" here?</summary>
+      <p>
+        The letters you type have to appear in the folder name in order, but they do
+        not have to be adjacent or start the word. Typing <code>wpr</code> matches
+        <strong>W</strong>ork <strong>Pr</strong>ojects, <strong>W</strong>eekly
+        <strong>Pr</strong>ep and <strong>W</strong>ord<strong>Pr</strong>ess. The
+        same matching runs against the folder's full path, so you can type a parent
+        folder's name to narrow down its children.
+      </p>
+    </details>
+
+    <details>
+      <summary>Can it replace Ctrl+D?</summary>
+      <p>
+        Not literally — Chrome reserves <kbd>Ctrl</kbd>+<kbd>D</kbd> at the browser
+        level and no extension can override it. Advanced Bookmarks suggests
+        <kbd>Alt</kbd>+<kbd>D</kbd>, and you can rebind it to any free combination at
+        <code>chrome://extensions/shortcuts</code>.
+      </p>
+    </details>
+
+    <details>
+      <summary>Does it collect anything?</summary>
+      <p>
+        No. There is no service worker, no analytics and no network code of any kind —
+        you can verify that in the
+        <a href="https://github.com/bcollard/chrome-advanced-bookmarks">source</a>, which
+        is a few hundred lines of dependency-free vanilla JavaScript. See the
+        <a href="privacy.html">privacy policy</a>.
+      </p>
+    </details>
+
+    <details>
+      <summary>Does it work outside Chrome?</summary>
+      <p>
+        Yes. It is a plain Manifest V3 extension using only the <code>bookmarks</code>
+        and <code>tabs</code> APIs, so it installs and runs in Edge, Brave, Vivaldi,
+        Opera and other Chromium-based browsers that can reach the Chrome Web Store.
+      </p>
+    </details>
+
+    <details>
+      <summary>What happens on a page I already bookmarked?</summary>
+      <p>
+        The dialog detects it, switches to edit mode, pre-selects the folder the
+        bookmark currently lives in and shows a Remove button. Moving a bookmark to a
+        different folder is the same fuzzy-search flow as creating one.
+      </p>
+    </details>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="links">
+      <a href="https://chromewebstore.google.com/detail/advanced-bookmarks/lllhlboikkambnobbpjifhkpckiigdio">Chrome Web Store</a>
+      <a href="https://github.com/bcollard/chrome-advanced-bookmarks">Source code</a>
+      <a href="https://github.com/bcollard/chrome-advanced-bookmarks/issues">Support &amp; bug reports</a>
+      <a href="privacy.html">Privacy</a>
+    </div>
+    <p style="margin:0">
+      Advanced Bookmarks is free and open source under the MIT license.
+      Built by <a href="https://github.com/bcollard">Baptiste Collard</a>.
+      Not affiliated with Google.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

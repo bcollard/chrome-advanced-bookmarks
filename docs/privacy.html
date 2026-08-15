@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy policy — Advanced Bookmarks</title>
+<meta name="description" content="Advanced Bookmarks collects, stores and transmits no data whatsoever. Full privacy policy for the Chrome extension.">
+<link rel="canonical" href="https://bcollard.github.io/chrome-advanced-bookmarks/privacy.html">
+<link rel="icon" href="img/icon128.png" type="image/png">
+<style>
+  :root { --ink:#16181d; --muted:#5f6368; --line:#e3e6ea; --bg:#fff; --blue:#1a73e8 }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink:#e8eaed; --muted:#9aa0a6; --line:#2c3138; --bg:#121417 }
+  }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 17px/1.68 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 56px 24px 80px }
+  a { color: var(--blue) }
+  h1 { font-size: 34px; letter-spacing: -.02em; margin: 0 0 6px }
+  .updated { color: var(--muted); font-size: 15px; margin: 0 0 36px }
+  h2 { font-size: 20px; margin: 38px 0 10px; letter-spacing: -.01em }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 15.5px }
+  th, td { text-align: left; padding: 11px 13px; border: 1px solid var(--line); vertical-align: top }
+  th { background: rgba(128,128,128,.08); font-weight: 600 }
+  code { font: 14.5px "SF Mono", Menlo, Consolas, monospace; background: rgba(128,128,128,.13);
+         border-radius: 4px; padding: 1px 5px }
+  .back { display: inline-block; margin-bottom: 28px; font-size: 15px }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="back" href="./">← Advanced Bookmarks</a>
+
+  <h1>Privacy policy</h1>
+  <p class="updated">Last updated: 15 August 2026 · applies to Advanced Bookmarks v1.2.0 and later</p>
+
+  <p>
+    <strong>Advanced Bookmarks collects no data.</strong> It contains no analytics, no
+    telemetry, no error reporting and no network code of any kind. Nothing you do in
+    the extension is recorded, stored off-device or transmitted anywhere.
+  </p>
+
+  <h2>What the extension can access, and why</h2>
+
+  <table>
+    <tr><th>Permission</th><th>What it is used for</th></tr>
+    <tr>
+      <td><code>bookmarks</code></td>
+      <td>
+        Read your bookmark folder tree so it can be searched, and create, update, move
+        or delete bookmarks when you ask it to. All of this happens through Chrome's
+        own bookmarks API, entirely on your device.
+      </td>
+    </tr>
+    <tr>
+      <td><code>tabs</code></td>
+      <td>
+        Read the title and URL of the tab that is active when you open the dialog, in
+        order to pre-fill the Name and URL fields. This value is used to populate the
+        form and nothing else.
+      </td>
+    </tr>
+  </table>
+
+  <p>
+    The extension requests no host permissions, so it cannot read or modify the content
+    of any web page.
+  </p>
+
+  <h2>Data transmission</h2>
+  <p>
+    None. The extension makes no HTTP requests, opens no sockets, loads no remote
+    scripts, fonts or images, and bundles no third-party libraries. It has no
+    background service worker. Everything runs in the popup, using only browser APIs.
+  </p>
+
+  <h2>Data storage</h2>
+  <p>
+    The extension does not use <code>chrome.storage</code> or any other persistence
+    layer. The only thing it writes is the bookmarks you explicitly save, which live in
+    your browser's own bookmark store exactly as they would if you had used Chrome's
+    built-in dialog.
+  </p>
+
+  <h2>Third parties</h2>
+  <p>
+    There are none. No data is sold, shared, or transferred to anyone, for any purpose.
+  </p>
+
+  <h2>Verifying this</h2>
+  <p>
+    The extension is open source under the MIT license and is a few hundred lines of
+    dependency-free vanilla JavaScript. You can read every line of it at
+    <a href="https://github.com/bcollard/chrome-advanced-bookmarks">github.com/bcollard/chrome-advanced-bookmarks</a>,
+    and compare it against the packaged extension in <code>chrome://extensions</code>.
+  </p>
+
+  <h2>Changes to this policy</h2>
+  <p>
+    If a future version ever needs to handle data differently, this page will be
+    updated before that version ships, and the change will be called out in the
+    release notes on GitHub.
+  </p>
+
+  <h2>Contact</h2>
+  <p>
+    Questions or concerns:
+    <a href="https://github.com/bcollard/chrome-advanced-bookmarks/issues">open an issue on GitHub</a>.
+  </p>
+
+</div>
+</body>
+</html>

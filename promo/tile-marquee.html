@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<!--
+  Chrome Web Store "marquee promo tile" — 1400 × 560.
+  Used in the rotating carousel on the store homepage; required to be
+  eligible for featured placement.
+
+  Rendered to PNG by: python3 scripts/generate-promo-tiles.py
+  Open this file directly in a browser to tweak the design live.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Marquee promo tile 1400×560</title>
+<style>
+  @page { margin: 0 }
+  html, body { margin: 0; padding: 0; background: #fff }
+
+  .tile {
+    width: 1400px;
+    height: 560px;
+    box-sizing: border-box;
+    padding: 0 92px;
+    display: flex;
+    align-items: center;
+    gap: 76px;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(90% 140% at 88% 8%, #4c8dff 0%, #1a73e8 40%, #0b3d91 100%);
+    font-family: "Google Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #fff;
+  }
+
+  /* ── Left column: the pitch ───────────────────────────── */
+  .copy { flex: 1 1 0; min-width: 0 }
+
+  .mark { display: flex; align-items: center; gap: 15px; margin-bottom: 34px }
+  .mark-label {
+    font-size: 21px;
+    font-weight: 500;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    opacity: .82;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 76px;
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: -.024em;
+  }
+  h1 em { font-style: normal; color: #ffd86b }
+
+  p {
+    margin: 26px 0 0;
+    font-size: 27px;
+    line-height: 1.4;
+    font-weight: 400;
+    opacity: .92;
+    max-width: 22em;
+  }
+
+  .kbd-hint {
+    margin-top: 34px;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    font-size: 20px;
+    opacity: .8;
+  }
+  kbd {
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 18px;
+    background: rgba(255, 255, 255, .18);
+    border: 1px solid rgba(255, 255, 255, .32);
+    border-bottom-width: 2px;
+    border-radius: 6px;
+    padding: 4px 10px;
+  }
+
+  /* ── Right column: a mock of the actual dialog ────────── */
+  .shot {
+    flex: none;
+    width: 470px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 34px 70px rgba(4, 26, 62, .45);
+    overflow: hidden;
+    color: #202124;
+    transform: rotate(-1.4deg);
+  }
+  .shot-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 17px 22px;
+    border-bottom: 1px solid #e8eaed;
+    font-size: 19px;
+    font-weight: 500;
+  }
+  .shot-body { padding: 20px 22px 24px }
+  .field-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #5f6368;
+    letter-spacing: .02em;
+    margin-bottom: 7px;
+  }
+  .field-box {
+    border: 2px solid #1a73e8;
+    border-radius: 9px;
+    padding: 11px 14px;
+    font-size: 18px;
+    font-family: "SF Mono", Menlo, monospace;
+  }
+  .field-box .cursor {
+    display: inline-block;
+    width: 2px;
+    height: 19px;
+    background: #1a73e8;
+    vertical-align: -4px;
+    margin-left: 2px;
+  }
+
+  .results { margin-top: 12px; border: 1px solid #e8eaed; border-radius: 9px; overflow: hidden }
+  .row { padding: 11px 15px; border-bottom: 1px solid #f1f3f4 }
+  .row:last-child { border-bottom: 0 }
+  .row--on { background: #e8f0fe }
+  .row-name { font-size: 17px; font-weight: 500 }
+  .row-name b { color: #1a73e8; background: #ffeaa0; border-radius: 3px; padding: 0 1px }
+  .row-path { font-size: 13px; color: #5f6368; margin-top: 3px }
+</style>
+</head>
+<body>
+  <div class="tile">
+
+    <div class="copy">
+      <div class="mark">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
+          <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+        </svg>
+        <span class="mark-label">Advanced Bookmarks</span>
+      </div>
+
+      <h1>Stop scrolling<br>for the <em>right folder</em></h1>
+      <p>Fuzzy search matches folder names and full paths, anywhere in your bookmark tree.</p>
+
+      <div class="kbd-hint">
+        <kbd>Alt</kbd><kbd>D</kbd>
+        <span>→ type → <kbd>Enter</kbd>. Saved.</span>
+      </div>
+    </div>
+
+    <div class="shot">
+      <div class="shot-head">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="#1a73e8" aria-hidden="true">
+          <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+        </svg>
+        Add Bookmark
+      </div>
+      <div class="shot-body">
+        <div class="field-label">FOLDER</div>
+        <div class="field-box">wpr<span class="cursor"></span></div>
+        <div class="results">
+          <div class="row row--on">
+            <div class="row-name"><b>W</b>ork <b>Pr</b>ojects</div>
+            <div class="row-path">Bookmarks Bar › Work</div>
+          </div>
+          <div class="row">
+            <div class="row-name"><b>W</b>eekly <b>Pr</b>ep</div>
+            <div class="row-path">Bookmarks Bar › Team › Rituals</div>
+          </div>
+          <div class="row">
+            <div class="row-name"><b>W</b>ord<b>Pr</b>ess</div>
+            <div class="row-path">Bookmarks Bar › Dev › CMS</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

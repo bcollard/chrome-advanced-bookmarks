@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<!--
+  Chrome Web Store "small promo tile" — 440 × 280.
+  Shown on the homepage, category pages and search results.
+
+  Rendered to PNG by: python3 scripts/generate-promo-tiles.py
+  Open this file directly in a browser to tweak the design live.
+
+  Store guidance applied here:
+    - saturated colour filling the whole region (no mostly-white tiles)
+    - minimal text, still legible when shrunk to half size (220 × 140)
+    - no fake badges ("Editor's Choice", "#1", …)
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Small promo tile 440×280</title>
+<style>
+  @page { margin: 0 }
+  html, body { margin: 0; padding: 0; background: #fff }
+
+  .tile {
+    width: 440px;
+    height: 280px;
+    box-sizing: border-box;
+    padding: 34px 36px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(120% 120% at 100% 0%, #4c8dff 0%, #1a73e8 42%, #0b3d91 100%);
+    font-family: "Google Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #fff;
+  }
+
+  /* Faint oversized mark bleeding off the right edge — adds depth, stays quiet */
+  .watermark {
+    position: absolute;
+    right: -78px;
+    bottom: -96px;
+    opacity: .11;
+  }
+
+  .mark { display: flex; align-items: center; gap: 12px }
+  .mark svg { flex: none }
+  .mark-label {
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    opacity: .82;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 37px;
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -.017em;
+    position: relative;
+  }
+  h1 em { font-style: normal; color: #ffd86b }
+
+  p {
+    margin: 12px 0 0;
+    font-size: 17px;
+    line-height: 1.35;
+    font-weight: 500;
+    opacity: .93;
+    position: relative;
+  }
+
+  /* Mock of the folder field, showing the product's actual behaviour */
+  .chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    background: rgba(255, 255, 255, .17);
+    border: 1px solid rgba(255, 255, 255, .34);
+    border-radius: 9px;
+    padding: 9px 14px;
+    font-size: 16px;
+    font-weight: 500;
+    font-family: "SF Mono", "Menlo", monospace;
+  }
+  .chip .typed { color: #ffd86b; font-weight: 700 }
+  .chip .rest { opacity: .85 }
+</style>
+</head>
+<body>
+  <div class="tile">
+
+    <svg class="watermark" width="260" height="260" viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
+      <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+    </svg>
+
+    <div class="mark">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
+        <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+      </svg>
+      <span class="mark-label">Advanced Bookmarks</span>
+    </div>
+
+    <div>
+      <h1>Find any folder<br>in <em>3 keystrokes</em></h1>
+      <p>Fuzzy search over your whole bookmark tree.</p>
+    </div>
+
+    <div class="chip"><span class="typed">wrk</span><span class="rest"> › Work › Projects</span></div>
+
+  </div>
+</body>
+</html>

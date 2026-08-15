@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://bcollard.github.io/chrome-advanced-bookmarks/sitemap.xml
