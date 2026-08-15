@@ -1,0 +1,43 @@
+{
+  "extName": {
+    "message": "Advanced Bookmarks – Recherche floue de dossiers",
+    "description": "Extension name shown in the toolbar and on the Chrome Web Store listing."
+  },
+  "extDescription": {
+    "message": "Gestionnaire de favoris avec recherche floue : tapez quelques lettres pour trouver n'importe quel dossier imbriqué.",
+    "description": "Store summary, 132 characters max."
+  },
+  "cmdOpenDialog": {
+    "message": "Ouvrir la fenêtre Advanced Bookmarks",
+    "description": "Label of the keyboard shortcut on chrome://extensions/shortcuts."
+  },
+
+  "headerAdd": { "message": "Ajouter un favori" },
+  "headerEdit": { "message": "Modifier le favori" },
+
+  "labelName": { "message": "Nom" },
+  "labelUrl": { "message": "URL" },
+  "labelFolder": { "message": "Dossier" },
+  "labelLocation": { "message": "Emplacement" },
+
+  "placeholderPageTitle": { "message": "Titre de la page" },
+  "placeholderSearchFolders": { "message": "Rechercher un dossier…" },
+  "placeholderFolderName": { "message": "Nom du dossier" },
+
+  "btnSave": { "message": "Enregistrer" },
+  "btnSaving": { "message": "Enregistrement…" },
+  "btnUpdate": { "message": "Mettre à jour" },
+  "btnUpdating": { "message": "Mise à jour…" },
+  "btnCancel": { "message": "Annuler" },
+  "btnRemove": { "message": "Supprimer" },
+  "btnCreate": { "message": "Créer" },
+
+  "msgSaved": { "message": "Favori enregistré !" },
+  "msgUpdated": { "message": "Favori mis à jour !" },
+  "msgRemoved": { "message": "Favori supprimé !" },
+
+  "warnNotBookmarkable": { "message": "Cette page ne peut pas être ajoutée aux favoris." },
+
+  "newFolderItem": { "message": "Nouveau dossier…" },
+  "newFolderTitle": { "message": "Nouveau dossier" }
+}

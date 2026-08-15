@@ -1,0 +1,43 @@
+{
+  "extName": {
+    "message": "Advanced Bookmarks – Fuzzy Folder Search",
+    "description": "Extension name shown in the toolbar and on the Chrome Web Store listing."
+  },
+  "extDescription": {
+    "message": "Bookmark dialog with fuzzy folder search: type a few letters to find any nested bookmark folder and save the page instantly.",
+    "description": "Store summary, 132 characters max."
+  },
+  "cmdOpenDialog": {
+    "message": "Open the Advanced Bookmarks dialog",
+    "description": "Label of the keyboard shortcut on chrome://extensions/shortcuts."
+  },
+
+  "headerAdd": { "message": "Add Bookmark" },
+  "headerEdit": { "message": "Edit Bookmark" },
+
+  "labelName": { "message": "Name" },
+  "labelUrl": { "message": "URL" },
+  "labelFolder": { "message": "Folder" },
+  "labelLocation": { "message": "Location" },
+
+  "placeholderPageTitle": { "message": "Page title" },
+  "placeholderSearchFolders": { "message": "Search folders…" },
+  "placeholderFolderName": { "message": "Folder name" },
+
+  "btnSave": { "message": "Save" },
+  "btnSaving": { "message": "Saving…" },
+  "btnUpdate": { "message": "Update" },
+  "btnUpdating": { "message": "Updating…" },
+  "btnCancel": { "message": "Cancel" },
+  "btnRemove": { "message": "Remove" },
+  "btnCreate": { "message": "Create" },
+
+  "msgSaved": { "message": "Bookmark saved!" },
+  "msgUpdated": { "message": "Bookmark updated!" },
+  "msgRemoved": { "message": "Bookmark removed!" },
+
+  "warnNotBookmarkable": { "message": "This page cannot be bookmarked." },
+
+  "newFolderItem": { "message": "New folder…" },
+  "newFolderTitle": { "message": "New folder" }
+}

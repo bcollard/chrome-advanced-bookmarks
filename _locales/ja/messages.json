@@ -1,0 +1,43 @@
+{
+  "extName": {
+    "message": "Advanced Bookmarks – あいまい検索でフォルダ選択",
+    "description": "Extension name shown in the toolbar and on the Chrome Web Store listing."
+  },
+  "extDescription": {
+    "message": "ブックマーク保存ダイアログをあいまい検索で高速化。数文字入力するだけで入れ子のフォルダをすぐに見つけられます。",
+    "description": "Store summary, 132 characters max."
+  },
+  "cmdOpenDialog": {
+    "message": "Advanced Bookmarks のダイアログを開く",
+    "description": "Label of the keyboard shortcut on chrome://extensions/shortcuts."
+  },
+
+  "headerAdd": { "message": "ブックマークを追加" },
+  "headerEdit": { "message": "ブックマークを編集" },
+
+  "labelName": { "message": "名前" },
+  "labelUrl": { "message": "URL" },
+  "labelFolder": { "message": "フォルダ" },
+  "labelLocation": { "message": "保存先" },
+
+  "placeholderPageTitle": { "message": "ページタイトル" },
+  "placeholderSearchFolders": { "message": "フォルダを検索…" },
+  "placeholderFolderName": { "message": "フォルダ名" },
+
+  "btnSave": { "message": "保存" },
+  "btnSaving": { "message": "保存中…" },
+  "btnUpdate": { "message": "更新" },
+  "btnUpdating": { "message": "更新中…" },
+  "btnCancel": { "message": "キャンセル" },
+  "btnRemove": { "message": "削除" },
+  "btnCreate": { "message": "作成" },
+
+  "msgSaved": { "message": "ブックマークを保存しました" },
+  "msgUpdated": { "message": "ブックマークを更新しました" },
+  "msgRemoved": { "message": "ブックマークを削除しました" },
+
+  "warnNotBookmarkable": { "message": "このページはブックマークできません。" },
+
+  "newFolderItem": { "message": "新しいフォルダ…" },
+  "newFolderTitle": { "message": "新しいフォルダ" }
+}

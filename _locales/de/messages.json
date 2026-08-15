@@ -1,0 +1,43 @@
+{
+  "extName": {
+    "message": "Advanced Bookmarks – Unscharfe Ordnersuche",
+    "description": "Extension name shown in the toolbar and on the Chrome Web Store listing."
+  },
+  "extDescription": {
+    "message": "Lesezeichen-Dialog mit unscharfer Suche: ein paar Buchstaben genügen, um jeden verschachtelten Ordner zu finden.",
+    "description": "Store summary, 132 characters max."
+  },
+  "cmdOpenDialog": {
+    "message": "Advanced-Bookmarks-Dialog öffnen",
+    "description": "Label of the keyboard shortcut on chrome://extensions/shortcuts."
+  },
+
+  "headerAdd": { "message": "Lesezeichen hinzufügen" },
+  "headerEdit": { "message": "Lesezeichen bearbeiten" },
+
+  "labelName": { "message": "Name" },
+  "labelUrl": { "message": "URL" },
+  "labelFolder": { "message": "Ordner" },
+  "labelLocation": { "message": "Speicherort" },
+
+  "placeholderPageTitle": { "message": "Seitentitel" },
+  "placeholderSearchFolders": { "message": "Ordner suchen…" },
+  "placeholderFolderName": { "message": "Ordnername" },
+
+  "btnSave": { "message": "Speichern" },
+  "btnSaving": { "message": "Wird gespeichert…" },
+  "btnUpdate": { "message": "Aktualisieren" },
+  "btnUpdating": { "message": "Wird aktualisiert…" },
+  "btnCancel": { "message": "Abbrechen" },
+  "btnRemove": { "message": "Entfernen" },
+  "btnCreate": { "message": "Erstellen" },
+
+  "msgSaved": { "message": "Lesezeichen gespeichert!" },
+  "msgUpdated": { "message": "Lesezeichen aktualisiert!" },
+  "msgRemoved": { "message": "Lesezeichen entfernt!" },
+
+  "warnNotBookmarkable": { "message": "Diese Seite kann nicht als Lesezeichen gespeichert werden." },
+
+  "newFolderItem": { "message": "Neuer Ordner…" },
+  "newFolderTitle": { "message": "Neuer Ordner" }
+}

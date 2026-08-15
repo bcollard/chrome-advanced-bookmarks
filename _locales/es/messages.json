@@ -1,0 +1,43 @@
+{
+  "extName": {
+    "message": "Advanced Bookmarks – Búsqueda difusa de carpetas",
+    "description": "Extension name shown in the toolbar and on the Chrome Web Store listing."
+  },
+  "extDescription": {
+    "message": "Gestor de marcadores con búsqueda difusa: escribe unas letras y encuentra cualquier carpeta anidada al instante.",
+    "description": "Store summary, 132 characters max."
+  },
+  "cmdOpenDialog": {
+    "message": "Abrir la ventana de Advanced Bookmarks",
+    "description": "Label of the keyboard shortcut on chrome://extensions/shortcuts."
+  },
+
+  "headerAdd": { "message": "Añadir marcador" },
+  "headerEdit": { "message": "Editar marcador" },
+
+  "labelName": { "message": "Nombre" },
+  "labelUrl": { "message": "URL" },
+  "labelFolder": { "message": "Carpeta" },
+  "labelLocation": { "message": "Ubicación" },
+
+  "placeholderPageTitle": { "message": "Título de la página" },
+  "placeholderSearchFolders": { "message": "Buscar carpetas…" },
+  "placeholderFolderName": { "message": "Nombre de la carpeta" },
+
+  "btnSave": { "message": "Guardar" },
+  "btnSaving": { "message": "Guardando…" },
+  "btnUpdate": { "message": "Actualizar" },
+  "btnUpdating": { "message": "Actualizando…" },
+  "btnCancel": { "message": "Cancelar" },
+  "btnRemove": { "message": "Eliminar" },
+  "btnCreate": { "message": "Crear" },
+
+  "msgSaved": { "message": "¡Marcador guardado!" },
+  "msgUpdated": { "message": "¡Marcador actualizado!" },
+  "msgRemoved": { "message": "¡Marcador eliminado!" },
+
+  "warnNotBookmarkable": { "message": "Esta página no se puede añadir a marcadores." },
+
+  "newFolderItem": { "message": "Nueva carpeta…" },
+  "newFolderTitle": { "message": "Nueva carpeta" }
+}

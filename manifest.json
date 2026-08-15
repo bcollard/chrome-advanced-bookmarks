@@ -1,15 +1,18 @@
 {
   "manifest_version": 3,
-  "name": "Advanced Bookmarks",
-  "version": "1.1.0",
-  "description": "Save bookmarks quickly with a searchable, filterable folder picker.",
+  "name": "__MSG_extName__",
+  "short_name": "Advanced Bookmarks",
+  "version": "1.2.0",
+  "default_locale": "en",
+  "description": "__MSG_extDescription__",
+  "homepage_url": "https://bcollard.github.io/chrome-advanced-bookmarks/",
   "permissions": [
     "bookmarks",
     "tabs"
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Advanced Bookmarks",
+    "default_title": "__MSG_extName__",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",
@@ -27,7 +30,7 @@
         "default": "Alt+D",
         "mac": "Alt+D"
       },
-      "description": "Open Advanced Bookmarks dialog"
+      "description": "__MSG_cmdOpenDialog__"
     }
   }
 }

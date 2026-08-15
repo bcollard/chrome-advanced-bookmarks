@@ -1,6 +1,34 @@
 'use strict';
 
 // ============================================================
+// Localization
+// ============================================================
+
+/** Look up a message from _locales; falls back to the key so nothing renders blank. */
+function t(key) {
+  return chrome.i18n.getMessage(key) || key;
+}
+
+/**
+ * Replace the English strings baked into popup.html with the active locale.
+ * Elements opt in with data-i18n (text content) or data-i18n-placeholder.
+ * The HTML keeps readable English defaults so the markup stays reviewable.
+ */
+function applyI18n() {
+  document.documentElement.lang = chrome.i18n.getUILanguage();
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const msg = chrome.i18n.getMessage(el.dataset.i18n);
+    if (msg) el.textContent = msg;
+  });
+
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const msg = chrome.i18n.getMessage(el.dataset.i18nPlaceholder);
+    if (msg) el.placeholder = msg;
+  });
+}
+
+// ============================================================
 // State
 // ============================================================
 
@@ -24,6 +52,8 @@ let dom = {};
 // ============================================================
 
 document.addEventListener('DOMContentLoaded', async () => {
+  applyI18n();
+
   dom = {
     titleInput:     document.getElementById('title'),
     urlInput:       document.getElementById('url'),
@@ -92,8 +122,8 @@ async function init() {
         allFolders.find(f => f.id === existingBookmark.parentId) ??
         allFolders.find(f => f.id === '1') ??
         allFolders[0];
-      dom.headerTitle.textContent = 'Edit Bookmark';
-      dom.submitLabel.textContent = 'Update';
+      dom.headerTitle.textContent = t('headerEdit');
+      dom.submitLabel.textContent = t('btnUpdate');
       dom.removeBtn.style.display = 'inline-flex';
     } else {
       // Try to guess the best folder from the page title, otherwise default to Bookmarks Bar
@@ -260,7 +290,7 @@ function renderDropdown(query) {
       <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
         <path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-1 8h-3v3h-2v-3h-3v-2h3V9h2v3h3v2z"/>
       </svg>
-      New folder…
+      ${escapeHtml(t('newFolderItem'))}
     </div>`;
 
   dom.dropdown.innerHTML = folderHtml + newFolderHtml;
@@ -492,7 +522,7 @@ async function saveBookmark() {
 
   dom.submitBtn.disabled = true;
   dom.cancelBtn.disabled = true;
-  dom.submitLabel.textContent = existingBookmark ? 'Updating…' : 'Saving…';
+  dom.submitLabel.textContent = existingBookmark ? t('btnUpdating') : t('btnSaving');
 
   try {
     if (existingBookmark) {
@@ -507,12 +537,12 @@ async function saveBookmark() {
         parentId: selectedFolder.id,
       });
     }
-    showSuccess(existingBookmark ? 'Bookmark updated!' : 'Bookmark saved!');
+    showSuccess(existingBookmark ? t('msgUpdated') : t('msgSaved'));
   } catch (err) {
     console.error('[Advanced Bookmarks] Save error:', err);
     dom.submitBtn.disabled = false;
     dom.cancelBtn.disabled = false;
-    dom.submitLabel.textContent = existingBookmark ? 'Update' : 'Save';
+    dom.submitLabel.textContent = existingBookmark ? t('btnUpdate') : t('btnSave');
   }
 }
 
@@ -525,7 +555,7 @@ async function removeBookmark() {
   try {
     dom.removeBtn.disabled = true;
     await chrome.bookmarks.remove(existingBookmark.id);
-    showSuccess('Bookmark removed!');
+    showSuccess(t('msgRemoved'));
   } catch (err) {
     console.error('[Advanced Bookmarks] Remove error:', err);
     dom.removeBtn.disabled = false;

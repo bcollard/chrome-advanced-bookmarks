@@ -14,7 +14,7 @@
       <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
       </svg>
-      <span>This page cannot be bookmarked.</span>
+      <span data-i18n="warnNotBookmarkable">This page cannot be bookmarked.</span>
     </div>
 
     <!-- Main content -->
@@ -25,7 +25,7 @@
         <svg class="header-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
           <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
         </svg>
-        <h1 class="header-title" id="header-title">Add Bookmark</h1>
+        <h1 class="header-title" id="header-title" data-i18n="headerAdd">Add Bookmark</h1>
       </header>
 
       <!-- Form -->
@@ -33,12 +33,13 @@
 
         <!-- Name -->
         <div class="field">
-          <label class="label" for="title">Name</label>
+          <label class="label" for="title" data-i18n="labelName">Name</label>
           <input
             type="text"
             id="title"
             class="input"
             placeholder="Page title"
+            data-i18n-placeholder="placeholderPageTitle"
             autocomplete="off"
             spellcheck="false"
           >
@@ -46,7 +47,7 @@
 
         <!-- URL (read-only) -->
         <div class="field">
-          <label class="label" for="url">URL</label>
+          <label class="label" for="url" data-i18n="labelUrl">URL</label>
           <input
             type="text"
             id="url"
@@ -58,13 +59,14 @@
 
         <!-- Folder picker -->
         <div class="field">
-          <label class="label" for="folder-input">Folder</label>
+          <label class="label" for="folder-input" data-i18n="labelFolder">Folder</label>
           <div class="folder-picker" id="folder-picker">
             <input
               type="text"
               id="folder-input"
               class="input folder-picker__input"
               placeholder="Search folders…"
+              data-i18n-placeholder="placeholderSearchFolders"
               autocomplete="off"
               spellcheck="false"
               role="combobox"
@@ -88,15 +90,15 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
           </svg>
-          Remove
+          <span data-i18n="btnRemove">Remove</span>
         </button>
         <div class="footer-right">
-          <button type="button" class="btn btn--secondary" id="cancel-btn">Cancel</button>
+          <button type="button" class="btn btn--secondary" id="cancel-btn" data-i18n="btnCancel">Cancel</button>
           <button type="button" class="btn btn--primary" id="submit-btn">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
             </svg>
-            <span id="submit-label">Save</span>
+            <span id="submit-label" data-i18n="btnSave">Save</span>
           </button>
         </div>
       </footer>
@@ -111,7 +113,7 @@
             <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
           </svg>
         </div>
-        <span class="success-msg" id="success-msg">Bookmark saved!</span>
+        <span class="success-msg" id="success-msg" data-i18n="msgSaved">Bookmark saved!</span>
       </div>
     </div>
 
@@ -122,19 +124,19 @@
           <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-1 8h-3v3h-2v-3h-3v-2h3V9h2v3h3v2z"/>
           </svg>
-          New folder
+          <span data-i18n="newFolderTitle">New folder</span>
         </h2>
         <div class="field">
-          <label class="label" for="nf-name">Name</label>
-          <input type="text" id="nf-name" class="input" placeholder="Folder name" autocomplete="off" spellcheck="false">
+          <label class="label" for="nf-name" data-i18n="labelName">Name</label>
+          <input type="text" id="nf-name" class="input" data-i18n-placeholder="placeholderFolderName" placeholder="Folder name" autocomplete="off" spellcheck="false">
         </div>
         <div class="field">
-          <label class="label" for="nf-parent">Location</label>
+          <label class="label" for="nf-parent" data-i18n="labelLocation">Location</label>
           <select id="nf-parent" class="input nf-select"></select>
         </div>
         <div class="nf-actions">
-          <button type="button" class="btn btn--secondary" id="nf-cancel">Cancel</button>
-          <button type="button" class="btn btn--primary" id="nf-create">Create</button>
+          <button type="button" class="btn btn--secondary" id="nf-cancel" data-i18n="btnCancel">Cancel</button>
+          <button type="button" class="btn btn--primary" id="nf-create" data-i18n="btnCreate">Create</button>
         </div>
       </div>
     </div>

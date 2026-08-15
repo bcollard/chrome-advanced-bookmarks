@@ -1,0 +1,43 @@
+{
+  "extName": {
+    "message": "Advanced Bookmarks – Busca difusa de pastas",
+    "description": "Extension name shown in the toolbar and on the Chrome Web Store listing."
+  },
+  "extDescription": {
+    "message": "Gerenciador de favoritos com busca difusa: digite algumas letras e encontre qualquer pasta aninhada na hora.",
+    "description": "Store summary, 132 characters max."
+  },
+  "cmdOpenDialog": {
+    "message": "Abrir a janela do Advanced Bookmarks",
+    "description": "Label of the keyboard shortcut on chrome://extensions/shortcuts."
+  },
+
+  "headerAdd": { "message": "Adicionar favorito" },
+  "headerEdit": { "message": "Editar favorito" },
+
+  "labelName": { "message": "Nome" },
+  "labelUrl": { "message": "URL" },
+  "labelFolder": { "message": "Pasta" },
+  "labelLocation": { "message": "Local" },
+
+  "placeholderPageTitle": { "message": "Título da página" },
+  "placeholderSearchFolders": { "message": "Buscar pastas…" },
+  "placeholderFolderName": { "message": "Nome da pasta" },
+
+  "btnSave": { "message": "Salvar" },
+  "btnSaving": { "message": "Salvando…" },
+  "btnUpdate": { "message": "Atualizar" },
+  "btnUpdating": { "message": "Atualizando…" },
+  "btnCancel": { "message": "Cancelar" },
+  "btnRemove": { "message": "Remover" },
+  "btnCreate": { "message": "Criar" },
+
+  "msgSaved": { "message": "Favorito salvo!" },
+  "msgUpdated": { "message": "Favorito atualizado!" },
+  "msgRemoved": { "message": "Favorito removido!" },
+
+  "warnNotBookmarkable": { "message": "Esta página não pode ser adicionada aos favoritos." },
+
+  "newFolderItem": { "message": "Nova pasta…" },
+  "newFolderTitle": { "message": "Nova pasta" }
+}

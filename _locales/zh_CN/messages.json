@@ -1,0 +1,43 @@
+{
+  "extName": {
+    "message": "Advanced Bookmarks – 书签文件夹模糊搜索",
+    "description": "Extension name shown in the toolbar and on the Chrome Web Store listing."
+  },
+  "extDescription": {
+    "message": "书签保存对话框，支持模糊搜索：输入几个字母即可找到任意多层嵌套的书签文件夹并立即保存。",
+    "description": "Store summary, 132 characters max."
+  },
+  "cmdOpenDialog": {
+    "message": "打开 Advanced Bookmarks 对话框",
+    "description": "Label of the keyboard shortcut on chrome://extensions/shortcuts."
+  },
+
+  "headerAdd": { "message": "添加书签" },
+  "headerEdit": { "message": "编辑书签" },
+
+  "labelName": { "message": "名称" },
+  "labelUrl": { "message": "网址" },
+  "labelFolder": { "message": "文件夹" },
+  "labelLocation": { "message": "位置" },
+
+  "placeholderPageTitle": { "message": "网页标题" },
+  "placeholderSearchFolders": { "message": "搜索文件夹…" },
+  "placeholderFolderName": { "message": "文件夹名称" },
+
+  "btnSave": { "message": "保存" },
+  "btnSaving": { "message": "正在保存…" },
+  "btnUpdate": { "message": "更新" },
+  "btnUpdating": { "message": "正在更新…" },
+  "btnCancel": { "message": "取消" },
+  "btnRemove": { "message": "删除" },
+  "btnCreate": { "message": "创建" },
+
+  "msgSaved": { "message": "书签已保存！" },
+  "msgUpdated": { "message": "书签已更新！" },
+  "msgRemoved": { "message": "书签已删除！" },
+
+  "warnNotBookmarkable": { "message": "此页面无法添加为书签。" },
+
+  "newFolderItem": { "message": "新建文件夹…" },
+  "newFolderTitle": { "message": "新建文件夹" }
+}
