@@ -9,6 +9,38 @@ Landing page: <https://bcollard.github.io/chrome-advanced-bookmarks/>
 
 ---
 
+## Verify the build
+
+Every release is built by [CI](.github/workflows/release.yml) from a tag, and the
+artifact is reproducible. You do not have to take on faith that the published
+extension was built from this source — you can check:
+
+```bash
+git checkout v1.2.0
+gh release download v1.2.0 -p '*.zip'
+python3 scripts/verify-reproducible.py advanced-bookmarks-1.2.0.zip
+```
+
+And to confirm the artifact came from this repository:
+
+```bash
+gh attestation verify advanced-bookmarks-1.2.0.zip --repo bcollard/chrome-advanced-bookmarks
+```
+
+Any Python 3 on any OS produces the same bytes. The archive stores its entries
+rather than compressing them, so no compressor build and no interpreter version
+is part of the contract — a mismatch means the contents genuinely differ, not
+that your toolchain differs from the one CI used.
+
+This matters because of a gap most extensions leave open: the Chrome Web Store
+signs the `.crx` itself from an uploaded `.zip`. The developer never signs
+anything, and nothing links the published bytes to a commit. Reproducibility plus
+attestation is what closes it — helped here by the extension being unbundled,
+dependency-free vanilla JavaScript, so the code in the archive is the code in
+this repository with no build step in between.
+
+---
+
 ## Features
 
 - **Fuzzy search** — filter folders by name or full path as you type; fuzzy matching finds results even with partial or out-of-order characters
@@ -94,13 +126,19 @@ chrome-advanced-bookmarks-extension/
 ├── store-listing/         # Paste-ready listing copy, one file per locale
 │
 │  ── tooling ─────────────────────────────────────────────
+├── .github/workflows/
+│   ├── ci.yml             # Gates: validate, icons, reproducibility
+│   └── release.yml        # Builds, attests and publishes on a v* tag
 ├── scripts/
 │   ├── generate-icons.py       # Generates PNG icons (stdlib only)
 │   ├── generate-promo-tiles.py # Renders promo/*.html via headless Chrome
+│   ├── pack.py                 # Deterministic .zip builder (explicit allowlist)
+│   ├── verify-reproducible.py  # Rebuilds and diffs against a published artifact
 │   ├── validate.py             # Manifest, _locales parity, listing limits
 │   └── resize-screenshots.sh   # Resizes screenshots for store submission
 ├── Makefile               # Developer shortcuts
 ├── PUBLISHING.md          # Release checklist for the Web Store
+├── SECURITY.md            # Reporting a vulnerability
 └── README.md
 ```
 
@@ -120,7 +158,8 @@ make icons      # Regenerate PNG icons
 make promo      # Re-render the store promo tiles from promo/*.html
 make site       # Preview the landing page at http://localhost:8000
 make validate   # Check manifest, _locales parity and store listing limits
-make pack       # Build a .zip ready for Chrome Web Store submission
+make pack       # Build the reproducible .zip for Chrome Web Store submission
+make verify     # Confirm the build reproduces (ZIP=<file> to check a release)
 make clean      # Remove the build/ directory
 make dev        # Open chrome://extensions in Chrome
 ```

@@ -4,8 +4,14 @@ Operational checklist for publishing a new version of Advanced Bookmarks. The
 account already exists and the item is already live, so this covers the update
 path only. First-time setup notes are at the bottom.
 
-**Dashboard:** <https://chrome.google.com/webstore/devconsole>
-**Item ID:** `lllhlboikkambnobbpjifhkpckiigdio`
+| | |
+|---|---|
+| Dashboard | <https://chrome.google.com/webstore/devconsole> |
+| Item ID | `lllhlboikkambnobbpjifhkpckiigdio` |
+| Store listing | <https://chromewebstore.google.com/detail/advanced-bookmarks/lllhlboikkambnobbpjifhkpckiigdio> |
+| Landing page | <https://bcollard.github.io/chrome-advanced-bookmarks/> |
+| Privacy policy | <https://bcollard.github.io/chrome-advanced-bookmarks/privacy.html> |
+| Support | <https://github.com/bcollard/chrome-advanced-bookmarks/issues> |
 
 ---
 
@@ -67,24 +73,51 @@ design, open those HTML files directly in a browser, edit, then re-run.
 
 ---
 
-## 3 — Package and upload
+## 3 — Tag, then upload the artifact CI produced
+
+**Do not upload a locally built zip.** Tagging is what produces the artifact
+users can verify: `.github/workflows/release.yml` fires on any `v*` tag, packs
+the extension, attests the result to this repository and commit, and publishes it
+as a GitHub release. The bytes you send to the store must be those bytes, or the
+attestation describes something nobody installed.
 
 ```bash
-make pack      # runs icons + validate, then builds build/advanced-bookmarks.zip
+# sanity check locally first — same gates CI runs
+make validate
+make verify                       # confirms the build is reproducible
+
+git tag v1.2.0 && git push --tags
 ```
 
-Confirm the zip contains **only** runtime files — `manifest.json`, `popup.*`,
-`icons/`, `_locales/`. It should be ~20 KiB. If it is hundreds of KiB, something
-from `screenshots/`, `docs/` or `promo/` leaked in; check `ZIP_EXCLUDES` in the
-Makefile.
+Then watch the run, and pull down what it published:
+
+```bash
+gh run watch
+gh release download v1.2.0 -p '*.zip'
+gh attestation verify advanced-bookmarks-1.2.0.zip --repo bcollard/chrome-advanced-bookmarks
+```
+
+That last command is the one a user would run. If it fails for you, it fails for
+them — stop and fix it before uploading anything.
+
+Sanity-check the archive contents: **only** `manifest.json`, `popup.*`, `icons/`
+and `_locales/`, around 54 KiB. `scripts/pack.py` builds from an explicit
+allowlist, so a stray directory cannot leak in the way `screenshots/` once did
+under the old exclude-list packer.
 
 Then, in the dashboard: **select the item → Package → Upload new package →**
-upload `build/advanced-bookmarks.zip`.
+upload the downloaded `advanced-bookmarks-<version>.zip`.
 
 > Upload the package **before** touching the listing text. The language selector
 > on the Store listing tab only offers languages that the uploaded package
 > declares under `_locales/`, so a fresh upload is what unlocks the six
 > non-English tabs.
+
+### If the store rejects the build and you have to change code
+
+Bump the version, and cut a **new tag**. Never move an existing one: the
+attestation binds an artifact to a commit, and a moved tag makes a published
+claim point at code that was never released.
 
 ---
 
@@ -178,10 +211,10 @@ Fix, then resubmit — the review clock restarts.
 
 ## 7 — After it goes live
 
-- [ ] Tag the release: `git tag v1.2.0 && git push --tags`
-- [ ] Enable GitHub Pages if not already on: repo **Settings → Pages → Source: `main` / `/docs`**
+- [ ] Confirm the release notes on the GitHub release name the version now live on the store — that pairing is what makes the attestation useful to a user
 - [ ] Load the live listing in an incognito window and read it as a stranger would
 - [ ] Check the listing in French and Japanese (`?hl=fr`, `?hl=ja`) — confirm the translations actually took
+- [ ] Confirm <https://bcollard.github.io/chrome-advanced-bookmarks/> still resolves and its "Add to Chrome" button points at the live listing
 - [ ] Submit the landing page to [Google Search Console](https://search.google.com/search-console) and request indexing
 
 ---

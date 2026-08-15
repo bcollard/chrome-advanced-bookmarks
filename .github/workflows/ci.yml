@@ -1,0 +1,50 @@
+name: CI
+
+# The gates that must pass before a tag can be cut. release.yml runs the same
+# ones again, so a release can never be published from a state CI would reject —
+# but they should have failed here first, on the commit that introduced them.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  check:
+    name: Validate and reproduce
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Manifest references, _locales key parity across all languages, store
+      # name/summary length limits, and every message key the popup asks for.
+      - name: Validate
+        run: python3 scripts/validate.py
+
+      # icons/ is generated, so it must match what the generator produces —
+      # otherwise the committed PNGs and the script silently drift apart.
+      - name: Confirm the icons are the ones the generator produces
+        run: |
+          python3 scripts/generate-icons.py
+          git diff --exit-code -- icons/ \
+            || { echo "::error::icons/ differs from scripts/generate-icons.py output"; exit 1; }
+
+      # The reproducibility claim in the README is only worth making if it is
+      # checked on every commit rather than at release time.
+      - name: Confirm the build reproduces
+        run: python3 scripts/verify-reproducible.py --self
+
+      - name: Check popup.js parses
+        run: node --check popup.js

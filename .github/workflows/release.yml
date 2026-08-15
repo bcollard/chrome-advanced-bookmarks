@@ -1,0 +1,136 @@
+name: Release
+
+# Publishes the exact .zip that gets uploaded to the Chrome Web Store, with a
+# build provenance attestation binding it to this commit and this workflow run.
+#
+# The gap being closed: the Web Store signs the .crx itself from an uploaded
+# .zip. The developer never signs anything, and nothing links the published
+# bytes to a commit -- so "the source is on GitHub" is an assertion rather than
+# something a user can check.
+#
+# Two things make it checkable here:
+#   1. the build is reproducible, so anyone can rebuild and compare;
+#   2. the artifact is attested, so its origin is cryptographically verifiable.
+#
+# The extension is unbundled, dependency-free vanilla JavaScript, so there is no
+# third property to argue about: the JavaScript in the release is the JavaScript
+# in the repository, byte for byte.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to build (must already exist)'
+        required: true
+
+permissions: {}
+
+jobs:
+  release:
+    name: Build, attest and publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the release
+      id-token: write # sign the provenance attestation
+      attestations: write # record it
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          persist-credentials: false
+
+      # Deliberately no setup-python step. The packer stores entries rather than
+      # deflating them, so the archive depends on no compressor and no
+      # interpreter version -- using whatever python3 the runner ships with is
+      # the point being demonstrated, not an oversight.
+      - name: Record the toolchain
+        run: python3 --version
+
+      # A release must not be the first time the gates run, but running them
+      # here too means a tag can never be published from a state that would
+      # have failed CI.
+      - name: Validate
+        run: python3 scripts/validate.py
+
+      - name: Confirm the icons are the ones the generator produces
+        run: |
+          python3 scripts/generate-icons.py
+          git diff --exit-code -- icons/ \
+            || { echo "::error::icons/ differs from scripts/generate-icons.py output"; exit 1; }
+
+      - name: Package
+        id: pack
+        run: python3 scripts/pack.py
+
+      # Proves the property the README asks readers to rely on, at the moment
+      # the artifact is created rather than as a claim about it.
+      - name: Confirm the build reproduces
+        run: python3 scripts/verify-reproducible.py --self
+
+      - name: Checksums
+        working-directory: build
+        run: sha256sum *.zip > SHA256SUMS
+
+      # Binds the artifact to this repository, this commit and this workflow
+      # run. Verifiable afterwards with:
+      #   gh attestation verify <zip> --repo <owner>/<repo>
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: ${{ steps.pack.outputs.zip_path }}
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.tag || github.ref_name }}
+          SHA256: ${{ steps.pack.outputs.sha256 }}
+          ZIP_NAME: ${{ steps.pack.outputs.zip_name }}
+        run: |
+          # `gh release` rather than a third-party action: one fewer dependency
+          # in the step that produces the thing users install.
+          {
+            echo "## Verify this build yourself"
+            echo
+            echo "This artifact is reproducible. You do not have to trust that it was built"
+            echo "from the source in this repository -- you can check."
+            echo
+            echo '```bash'
+            echo "git clone https://github.com/${GITHUB_REPOSITORY}.git"
+            echo "cd \$(basename ${GITHUB_REPOSITORY})"
+            echo "git checkout ${TAG}"
+            echo "python3 scripts/verify-reproducible.py ${ZIP_NAME}"
+            echo '```'
+            echo
+            echo "Any Python 3 on any OS produces the same bytes -- the archive stores its"
+            echo "entries rather than compressing them, so no compressor or interpreter"
+            echo "version is part of the contract. A mismatch means the contents differ."
+            echo
+            echo "And to confirm where it came from:"
+            echo
+            echo '```bash'
+            echo "gh attestation verify ${ZIP_NAME} --repo ${GITHUB_REPOSITORY}"
+            echo '```'
+            echo
+            echo "| | |"
+            echo "|---|---|"
+            echo "| SHA-256 | \`${SHA256}\` |"
+            echo "| Built with | \`$(python3 --version)\` (not part of the contract) |"
+            echo "| Commit | \`${GITHUB_SHA}\` |"
+            echo
+            echo "The extension is unbundled, dependency-free vanilla JavaScript: the code in"
+            echo "this archive is the code in the repository, with no build step in between."
+            echo
+            echo "Landing page: https://bcollard.github.io/chrome-advanced-bookmarks/"
+          } > release-notes.md
+
+          gh release create "${TAG}" \
+            --title "Advanced Bookmarks ${TAG}" \
+            --notes-file release-notes.md \
+            build/*.zip build/SHA256SUMS

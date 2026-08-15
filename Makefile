@@ -4,24 +4,10 @@
 
 EXTENSION_NAME := advanced-bookmarks
 BUILD_DIR      := build
-ZIP_FILE       := $(BUILD_DIR)/$(EXTENSION_NAME).zip
 
-# Files/dirs to exclude from the distribution zip.
-# Everything that is listing material or tooling — never shipped to users.
-ZIP_EXCLUDES := \
-	"*.git*"           \
-	"$(BUILD_DIR)/*"   \
-	"scripts/*"        \
-	"docs/*"           \
-	"promo/*"          \
-	"store-listing/*"  \
-	"screenshots/*"    \
-	"*.md"             \
-	"Makefile"         \
-	".DS_Store"        \
-	"*.crx"            \
-	"*.pem"            \
-	".claude/*"
+# The distribution zip is built by scripts/pack.py, which carries an explicit
+# allowlist of what ships. Nothing here decides that any more -- an exclude list
+# is how 484 KiB of store screenshots ended up in a published release.
 
 .DEFAULT_GOAL := help
 
@@ -56,16 +42,17 @@ site:                ## Preview the GitHub Pages landing page at http://localhos
 
 # ────────────────────────────────────────
 .PHONY: pack
-pack: icons validate ## Build a .zip ready for Chrome Web Store upload
-	@echo "Packaging extension..."
-	@mkdir -p $(BUILD_DIR)
-	@rm -f $(ZIP_FILE)
-	@zip -r $(ZIP_FILE) . $(addprefix --exclude , $(ZIP_EXCLUDES)) > /dev/null
-	@echo "Created $(ZIP_FILE)"
-	@echo "Size: $$(du -sh $(ZIP_FILE) | cut -f1)"
-	@echo ""
-	@echo "Contents:"
-	@unzip -l $(ZIP_FILE) | tail -n +4 | head -n -2 | awk '{print "  " $$4}'
+pack: icons validate ## Build the reproducible .zip for Chrome Web Store upload
+	python3 scripts/pack.py
+
+# ────────────────────────────────────────
+.PHONY: verify
+verify:              ## Check the build is reproducible; pass ZIP=<file> to compare a release
+	@if [ -n "$(ZIP)" ]; then \
+		python3 scripts/verify-reproducible.py "$(ZIP)"; \
+	else \
+		python3 scripts/verify-reproducible.py --self; \
+	fi
 
 # ────────────────────────────────────────
 .PHONY: sign
