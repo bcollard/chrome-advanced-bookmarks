@@ -58,11 +58,13 @@
       </td>
     </tr>
     <tr>
-      <td><code>tabs</code></td>
+      <td><code>activeTab</code></td>
       <td>
         Read the title and URL of the tab that is active when you open the dialog, in
         order to pre-fill the Name and URL fields. This value is used to populate the
-        form and nothing else.
+        form and nothing else. Chrome grants this access only for the tab you are on,
+        and only because you opened the dialog; the extension cannot see any other
+        tab, and cannot see anything at all when the dialog is closed.
       </td>
     </tr>
   </table>

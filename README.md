@@ -179,7 +179,7 @@ See [PUBLISHING.md](PUBLISHING.md) for the complete step-by-step guide.
 | Permission | Why it's needed |
 |---|---|
 | `bookmarks` | Read the folder tree; create, update, move, and delete bookmarks |
-| `tabs` | Read the active tab's URL and title to pre-fill the dialog |
+| `activeTab` | Read the active tab's URL and title to pre-fill the dialog. Granted only for the tab you are on, and only when you open the dialog |
 
 No host permissions are requested. No data leaves the browser.
 

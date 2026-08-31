@@ -176,7 +176,7 @@ blocks submission.
 |---|---|
 | Single purpose | Bookmark management: saving and organizing bookmarks into folders |
 | `bookmarks` justification | Read the user's folder tree to make it searchable, and create, update, move or delete bookmarks on request |
-| `tabs` justification | Read the active tab's title and URL to pre-fill the bookmark form |
+| `activeTab` justification | Read the active tab's title and URL to pre-fill the bookmark form. Access is granted by the user's own click or shortcut, for that tab only |
 | Remote code | **No** — all code is in the package |
 | Data collection | **None** — tick every "does not collect" box |
 | Privacy policy URL | `https://bcollard.github.io/chrome-advanced-bookmarks/privacy.html` |

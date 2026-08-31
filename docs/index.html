@@ -98,7 +98,7 @@
       "name": "Does it work in Edge, Brave and other Chromium browsers?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. It is a standard Manifest V3 extension using only the bookmarks and tabs APIs, so it runs in any Chromium-based browser that can install extensions from the Chrome Web Store."
+        "text": "Yes. It is a standard Manifest V3 extension using only the bookmarks and activeTab APIs, so it runs in any Chromium-based browser that can install extensions from the Chrome Web Store."
       }
     }
   ]
@@ -445,7 +445,7 @@
           </svg>
         </div>
         <h3>Nothing leaves the browser</h3>
-        <p>Two permissions, both required to do the job: <code>bookmarks</code> to read and write the tree, <code>tabs</code> to read the current page's title and URL. No host permissions, no analytics, no network calls.</p>
+        <p>Two permissions, both required to do the job: <code>bookmarks</code> to read and write the tree, <code>activeTab</code> to read the current page's title and URL — granted only for the tab you are on, and only at the moment you open the dialog. No host permissions, no analytics, no network calls.</p>
       </div>
     </div>
   </div>
@@ -570,7 +570,7 @@
       <summary>Does it work outside Chrome?</summary>
       <p>
         Yes. It is a plain Manifest V3 extension using only the <code>bookmarks</code>
-        and <code>tabs</code> APIs, so it installs and runs in Edge, Brave, Vivaldi,
+        and <code>activeTab</code> APIs, so it installs and runs in Edge, Brave, Vivaldi,
         Opera and other Chromium-based browsers that can reach the Chrome Web Store.
       </p>
     </details>

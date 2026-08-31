@@ -34,12 +34,14 @@ storage, no host permissions — so the realistic categories are:
 
 ## What is not a vulnerability
 
-- The `bookmarks` and `tabs` permissions themselves. Both are required for the
+- The `bookmarks` and `activeTab` permissions themselves. Both are required for the
   extension to do its job and are documented in the
   [privacy policy](https://bcollard.github.io/chrome-advanced-bookmarks/privacy.html).
 - The extension being able to read the active tab's URL and title. That is the
-  `tabs` permission working as declared; the value is used to pre-fill the form
-  and is not stored or transmitted.
+  `activeTab` permission working as declared; the value is used to pre-fill the
+  form and is not stored or transmitted. Unlike the broader `tabs` permission it
+  replaces, it grants nothing until you invoke the extension, and only for the
+  tab you invoke it on.
 
 ## Provenance
 
