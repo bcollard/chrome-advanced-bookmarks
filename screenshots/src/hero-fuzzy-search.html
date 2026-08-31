@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<!--
+  Store screenshot scene — "fuzzy folder search" (1280 × 800).
+
+  This is a TEMPLATE, not a standalone page. scripts/generate-screenshots.py
+  substitutes the {{...}} placeholders with the real extension's markup, CSS and
+  script, writes the composed page to screenshots/src/.build/ and renders it.
+
+  The point of composing rather than mocking: the popup shown here IS
+  popup.html + popup.css driven by the shipped popup.js, against a stubbed
+  chrome.* API. Change the UI and this screenshot changes with it — there is no
+  second copy of the markup to keep in sync.
+
+  To preview: run `make screenshots`, then open the composed file left behind in
+  screenshots/src/.build/hero-fuzzy-search.html.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Advanced Bookmarks — fuzzy folder search</title>
+
+<!-- The real extension stylesheet, injected as an absolute file:// path. -->
+<link rel="stylesheet" href="{{POPUP_CSS}}">
+
+<style>
+  /* ── Stage ────────────────────────────────────────────────
+     popup.css sets `body { width: 380px }` and openDropdown() writes an inline
+     `min-height` onto the body to grow the real popup window. Neither is wanted
+     on a 1280×800 canvas, so both are overridden here. A stylesheet rule marked
+     !important beats the inline style popup.js sets, which is why it is used. */
+  html, body {
+    width: 1280px !important;
+    height: 800px !important;
+    min-height: 0 !important;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .stage {
+    position: relative;
+    width: 1280px;
+    height: 800px;
+    overflow: hidden;
+    background:
+      radial-gradient(120% 100% at 78% -10%, #eaf1fe 0%, #dce7fa 45%, #cddcf6 100%);
+    font-family: "Google Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  /* ── Caption ──────────────────────────────────────────── */
+  .caption {
+    position: absolute;
+    top: 44px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    padding: 0 80px;
+  }
+  .caption h2 {
+    margin: 0;
+    font-size: 40px;
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -.02em;
+    color: #0f2c5c;
+  }
+  .caption p {
+    margin: 14px 0 0;
+    font-size: 21px;
+    font-weight: 400;
+    color: #3f5b86;
+  }
+  .caption em { font-style: normal; color: #1a73e8 }
+
+  /* ── Browser toolbar strip, for context ───────────────── */
+  .toolbar {
+    position: absolute;
+    top: 182px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 860px;
+    height: 52px;
+    border-radius: 12px 12px 0 0;
+    background: #35363a;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 18px;
+    padding: 0 22px;
+    box-shadow: 0 -1px 0 rgba(255,255,255,.06) inset;
+  }
+  .toolbar .dot { width: 17px; height: 17px; border-radius: 50%; opacity: .5; background: #9aa0a6 }
+  .toolbar .spacer { flex: 1 }
+  /* The extension's own action icon, shown active as it is when the popup is open */
+  .toolbar .action {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.16);
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ── The popup itself ─────────────────────────────────── */
+  .popup-anchor {
+    position: absolute;
+    top: 226px;
+    /* Chrome anchors an action popup to its toolbar icon, right-aligned, so the
+       offset puts the card under the icon rather than in the middle of the
+       canvas. The scale is the largest that still fits the whole dropdown --
+       including the "New folder" row -- inside 800px. */
+    left: calc(50% + 165px);
+    transform: translateX(-50%) scale(1.28);
+    transform-origin: top center;
+  }
+  .popup-anchor .app {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 26px 60px rgba(11, 45, 105, .30), 0 2px 6px rgba(11, 45, 105, .16);
+    /* No overflow:hidden — the dropdown is meant to extend past the card edge. */
+  }
+  .popup-anchor .header { border-radius: 12px 12px 0 0 }
+</style>
+</head>
+<body>
+  <div class="stage">
+
+    <div class="caption">
+      <h2>Type what you remember, not where you filed it</h2>
+      <p>Three letters — <em>wpr</em> — find every matching folder, however deep it is nested.</p>
+    </div>
+
+    <div class="toolbar">
+      <span class="dot"></span>
+      <span class="spacer"></span>
+      <span class="action">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="#8ab4f8" aria-hidden="true">
+          <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+        </svg>
+      </span>
+    </div>
+
+    <div class="popup-anchor">
+      <!-- Real popup.html body markup, injected at build time. -->
+      {{POPUP_BODY}}
+    </div>
+
+  </div>
+
+<script>
+// ── Scene data ──────────────────────────────────────────────
+// The bookmark tree and active tab the stubbed chrome.* API will report.
+// "wpr" is chosen to show *fuzzy* matching: it is not a prefix of any of the
+// three folders it finds, and it matches across a word boundary in each.
+window.SCENE_MESSAGES = {{MESSAGES_JSON}};
+window.SCENE_UI_LANGUAGE = '{{UI_LANGUAGE}}';
+
+window.SCENE = {
+  query: 'wpr',
+  tab: {
+    id: 1,
+    title: 'Kubernetes Documentation',
+    url: 'https://kubernetes.io/docs/home/',
+  },
+  tree: [{
+    id: '0', title: '', children: [
+      { id: '1', title: 'Bookmarks bar', children: [
+        { id: '10', title: 'Work', children: [
+          { id: '100', title: 'Work Projects', children: [] },
+          { id: '101', title: 'Invoices',      children: [] },
+        ]},
+        { id: '11', title: 'Team', children: [
+          { id: '110', title: 'Rituals', children: [
+            { id: '1100', title: 'Weekly Prep', children: [] },
+            { id: '1101', title: 'Retros',      children: [] },
+          ]},
+        ]},
+        { id: '12', title: 'Dev', children: [
+          { id: '120', title: 'CMS', children: [
+            { id: '1200', title: 'WordPress', children: [] },
+            { id: '1201', title: 'Ghost',     children: [] },
+          ]},
+          { id: '121', title: 'Kubernetes', children: [] },
+        ]},
+        { id: '13', title: 'Reading', children: [] },
+        { id: '14', title: 'Travel',  children: [] },
+      ]},
+      { id: '2', title: 'Other bookmarks', children: [
+        { id: '20', title: 'Recipes', children: [] },
+      ]},
+    ],
+  }],
+};
+
+// ── chrome.* stub ───────────────────────────────────────────
+// Only the surface popup.js actually touches. Everything is read-only: the
+// mutating bookmark calls are present so a mis-drive fails loudly rather than
+// silently screenshotting a half-rendered popup.
+const notNeeded = name => () => { throw new Error(`scene: chrome.${name} should not be called`); };
+
+window.chrome = {
+  i18n: {
+    // The real message catalogue, injected at build time from _locales/. Serving
+    // empty strings here would make t() fall back to raw keys and quietly
+    // screenshot "newFolderItem" instead of "New folder..." -- so a missing
+    // translation shows up as a visibly broken screenshot rather than shipping.
+    getMessage: key => window.SCENE_MESSAGES[key] || '',
+    getUILanguage: () => window.SCENE_UI_LANGUAGE,
+  },
+  tabs: {
+    query: async () => [window.SCENE.tab],
+  },
+  bookmarks: {
+    getTree: async () => window.SCENE.tree,
+    search:  async () => [],          // no existing bookmark → "Add Bookmark"
+    create:  notNeeded('bookmarks.create'),
+    update:  notNeeded('bookmarks.update'),
+    move:    notNeeded('bookmarks.move'),
+    remove:  notNeeded('bookmarks.remove'),
+  },
+};
+</script>
+
+<!-- The real popup logic, injected at build time. Runs against the stub above. -->
+<script src="{{POPUP_JS}}"></script>
+
+<script>
+// ── Scene driver ────────────────────────────────────────────
+// popup.js initialises asynchronously, so wait for its own evidence of being
+// ready (the URL field it populates in step 3 of init) rather than guessing a
+// delay, then type the query the way a user would so the dropdown is rendered
+// by the shipped code path.
+(async () => {
+  const input = document.getElementById('folder-input');
+  const url   = document.getElementById('url');
+
+  const ready = await (async () => {
+    for (let i = 0; i < 200; i++) {
+      if (url.value) return true;
+      await new Promise(r => setTimeout(r, 10));
+    }
+    return false;
+  })();
+
+  if (!ready) {
+    document.title = 'SCENE ERROR: popup did not initialise';
+    return;
+  }
+
+  input.focus();
+  input.value = window.SCENE.query;
+  input.dispatchEvent(new Event('input', { bubbles: true }));
+
+  // Let openDropdown's requestAnimationFrame callback settle, then mark the
+  // page ready. generate-screenshots.py waits for this class before capturing.
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    document.body.style.minHeight = '';       // undo the popup-window growth
+    document.documentElement.classList.add('scene-ready');
+  }));
+})();
+</script>
+</body>
+</html>

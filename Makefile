@@ -35,6 +35,11 @@ promo:               ## Render the store promo tiles (440x280 + 1400x560) from p
 	python3 scripts/generate-promo-tiles.py
 
 # ────────────────────────────────────────
+.PHONY: screenshots
+screenshots:         ## Render store screenshots (1280x800) from screenshots/src/*.html
+	python3 scripts/generate-screenshots.py
+
+# ────────────────────────────────────────
 .PHONY: site
 site:                ## Preview the GitHub Pages landing page at http://localhost:8000
 	@echo "Serving docs/ at http://localhost:8000 — Ctrl+C to stop"
