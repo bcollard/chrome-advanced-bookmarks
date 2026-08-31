@@ -123,6 +123,7 @@ chrome-advanced-bookmarks-extension/
 ├── docs/                  # GitHub Pages landing page (+ privacy policy)
 ├── promo/                 # Store promo tiles: HTML sources + rendered PNGs
 ├── screenshots/           # 1280×800 store screenshots
+│   └── src/               # Scenes for the generated ones (see screenshots/README.md)
 ├── store-listing/         # Paste-ready listing copy, one file per locale
 │
 │  ── tooling ─────────────────────────────────────────────
@@ -132,6 +133,7 @@ chrome-advanced-bookmarks-extension/
 ├── scripts/
 │   ├── generate-icons.py       # Generates PNG icons (stdlib only)
 │   ├── generate-promo-tiles.py # Renders promo/*.html via headless Chrome
+│   ├── generate-screenshots.py # Renders screenshots/src/*.html against the real popup
 │   ├── pack.py                 # Deterministic .zip builder (explicit allowlist)
 │   ├── verify-reproducible.py  # Rebuilds and diffs against a published artifact
 │   ├── validate.py             # Manifest, _locales parity, listing limits
