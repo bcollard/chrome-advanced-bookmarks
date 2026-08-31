@@ -95,6 +95,14 @@
     },
     {
       "@type": "Question",
+      "name": "Why does Chrome say this extension is not trusted by Enhanced Safe Browsing?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "That warning is shown to users with Enhanced Safe Browsing enabled for any extension that is not yet on Google's trusted list, which is the default for small and recently published extensions. It is not a detection of anything harmful: nothing was found in the extension. Google grants trust based on a track record in the Chrome Web Store rather than on a review you can request, so it clears with time and installs. In the meantime you do not have to take the extension on trust either way, because every release is reproducible and carries a signed build provenance attestation you can verify yourself."
+      }
+    },
+    {
+      "@type": "Question",
       "name": "Does it work in Edge, Brave and other Chromium browsers?",
       "acceptedAnswer": {
         "@type": "Answer",
@@ -563,6 +571,25 @@
         have to take on faith that it is what you installed — the published build is
         <a href="#verify">reproducible and attested</a>. See also the
         <a href="privacy.html">privacy policy</a>.
+      </p>
+    </details>
+
+    <details>
+      <summary>Chrome warned me this extension is "not trusted by Enhanced Safe Browsing"</summary>
+      <p>
+        That prompt appears for anyone with Enhanced Safe Browsing switched on, for
+        every extension that is not yet on Google's trusted list — which is where
+        every small or recently published extension starts. It does not mean anything
+        was found: it means Google has not yet vouched for it. Trust is granted on a
+        track record of installs and time in the store, not through a review a
+        developer can request, so it is not something this project can fix on demand.
+      </p>
+      <p>
+        You do not have to take either verdict on faith, though. Every release is
+        <a href="#verify">reproducible and attested</a> — you can confirm the code
+        that runs in your browser was built by GitHub Actions from the tagged commit,
+        and rebuild it yourself to compare byte for byte. That is a stronger guarantee
+        than a trust badge, and it is checkable today.
       </p>
     </details>
 
