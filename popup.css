@@ -236,6 +236,30 @@ body {
   text-overflow: ellipsis;
 }
 
+.folder-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 4px;
+  padding: 0 2px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #80868b;
+}
+
+.folder-breadcrumb:empty {
+  display: none;
+}
+
+.folder-breadcrumb__part {
+  overflow-wrap: anywhere;
+}
+
+.folder-breadcrumb__part--current {
+  color: #5f6368;
+  font-weight: 600;
+}
+
 .item-path {
   font-size: 11px;
   color: #80868b;

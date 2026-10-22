@@ -31,7 +31,7 @@ Abra com o seu atalho, digite para filtrar, setas para navegar, Enter para salva
 
 TAMBÉM INCLUI
 • Crie uma pasta nova dentro da própria janela e escolha o local na árvore completa
-• Páginas já favoritadas abrem em modo de edição, com a pasta atual pré-selecionada
+• Páginas já favoritadas abrem em modo de edição, com a pasta atual pré-selecionada e seu local completo exibido abaixo do campo de pasta
 • Remova um favorito sem sair da janela
 • Interface disponível em português, inglês, francês, alemão, espanhol, japonês e chinês
 

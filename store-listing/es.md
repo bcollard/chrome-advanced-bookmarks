@@ -31,7 +31,7 @@ Abre con tu atajo, escribe para filtrar, flechas para moverte, Intro para guarda
 
 TAMBIÉN INCLUYE
 • Crea una carpeta nueva desde el propio diálogo y elige su ubicación en el árbol completo
-• Las páginas ya guardadas se abren en modo edición, con su carpeta actual preseleccionada
+• Las páginas ya guardadas se abren en modo edición, con su carpeta actual preseleccionada y su ubicación completa visible bajo el campo de carpeta
 • Elimina un marcador sin salir del diálogo
 • Interfaz disponible en español, inglés, francés, alemán, portugués, japonés y chino
 

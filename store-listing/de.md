@@ -31,7 +31,7 @@ Mit Ihrem Kürzel öffnen, tippen zum Filtern, Pfeiltasten zum Navigieren, Enter
 
 AUSSERDEM
 • Neuen Ordner direkt im Dialog anlegen und seinen Speicherort im gesamten Baum auswählen
-• Bereits gespeicherte Seiten öffnen sich im Bearbeitungsmodus mit vorausgewähltem aktuellen Ordner
+• Bereits gespeicherte Seiten öffnen sich im Bearbeitungsmodus mit vorausgewähltem aktuellen Ordner, dessen vollständiger Pfad unter dem Ordnerfeld angezeigt wird
 • Lesezeichen entfernen, ohne den Dialog zu verlassen
 • Oberfläche verfügbar auf Deutsch, Englisch, Französisch, Spanisch, Portugiesisch, Japanisch und Chinesisch
 

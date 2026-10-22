@@ -59,6 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     urlInput:       document.getElementById('url'),
     folderInput:    document.getElementById('folder-input'),
     folderPicker:   document.getElementById('folder-picker'),
+    folderBreadcrumb: document.getElementById('folder-breadcrumb'),
     dropdown:       document.getElementById('dropdown'),
     submitBtn:      document.getElementById('submit-btn'),
     submitLabel:    document.getElementById('submit-label'),
@@ -191,6 +192,17 @@ function updateFolderDisplay() {
   if (!selectedFolder) return;
   dom.folderInput.value = selectedFolder.title;
   dom.folderInput.title = selectedFolder.fullPath; // native tooltip for long paths
+  renderBreadcrumb();
+}
+
+/** Show the selected folder's full location (ancestors › folder) below the picker. */
+function renderBreadcrumb() {
+  const parts = [...selectedFolder.pathParts, selectedFolder.title];
+  dom.folderBreadcrumb.innerHTML = parts.map((part, i) => {
+    const cls = i === parts.length - 1 ? 'folder-breadcrumb__part folder-breadcrumb__part--current' : 'folder-breadcrumb__part';
+    return `<span class="${cls}">${escapeHtml(part)}</span>`;
+  }).join('<span class="folder-breadcrumb__sep" aria-hidden="true">›</span>');
+  dom.folderBreadcrumb.title = selectedFolder.fullPath;
 }
 
 // ============================================================

@@ -36,7 +36,7 @@ Open with your shortcut, type to filter, arrow keys to move, Enter to save, Esca
 
 ALSO INCLUDED
 • Create a new folder from inside the dialog and choose its parent from the full tree
-• Pages you have already bookmarked open in edit mode with their current folder pre-selected
+• Pages you have already bookmarked open in edit mode with their current folder pre-selected, and its full location shown under the folder field
 • Remove a bookmark without leaving the dialog
 • Interface available in English, French, German, Spanish, Portuguese, Japanese and Chinese
 

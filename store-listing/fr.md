@@ -31,7 +31,7 @@ Ouvrez avec votre raccourci, tapez pour filtrer, flèches pour naviguer, Entrée
 
 ÉGALEMENT INCLUS
 • Créez un nouveau dossier depuis la fenêtre elle-même et choisissez son emplacement dans l'arborescence complète
-• Les pages déjà mises en favori s'ouvrent en mode édition, avec leur dossier actuel présélectionné
+• Les pages déjà mises en favori s'ouvrent en mode édition, avec leur dossier actuel présélectionné et son emplacement complet affiché sous le champ dossier
 • Supprimez un favori sans quitter la fenêtre
 • Interface disponible en français, anglais, allemand, espagnol, portugais, japonais et chinois
 
