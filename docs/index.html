@@ -319,6 +319,20 @@
     color: var(--muted); font-size: 14.5px;
   }
   footer .links { display: flex; flex-wrap: wrap; gap: 18px; margin-bottom: 14px }
+  /* zoomable images: <a class="zoomable" href="full.png"><img></a>; the script at the
+     end opens a full-screen viewer, without JS the link opens the image itself */
+  a.zoomable { display: block; cursor: zoom-in }
+  a.zoomable img { transition: opacity .15s }
+  a.zoomable:hover img { opacity: .88 }
+  .zoom-viewer { position: fixed; inset: 0; z-index: 1000; background: rgba(8, 9, 14, .97); backdrop-filter: blur(4px); display: flex; flex-direction: column }
+  .zoom-viewer[hidden] { display: none }
+  .zoom-bar { background: #0f1118; border-bottom: 1px solid rgba(255,255,255,.08); display: flex; gap: 8px; align-items: center; justify-content: flex-end; padding: 10px 16px; color: #e6e8f2; font-size: 13px }
+  .zoom-bar .zoom-level { margin-right: auto; font-variant-numeric: tabular-nums; color: #b5b9cc }
+  .zoom-bar button { font: inherit; min-width: 36px; height: 34px; padding: 0 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.08); color: #fff; cursor: pointer }
+  .zoom-bar button:hover { background: rgba(255,255,255,.16) }
+  .zoom-stage { flex: 1; overflow: auto; cursor: grab; touch-action: none; overscroll-behavior: contain }
+  .zoom-stage.dragging { cursor: grabbing }
+  .zoom-stage img { display: block; margin: 0 auto 24px; max-width: none; border-radius: 6px; user-select: none; -webkit-user-drag: none }
 </style>
 </head>
 <body>
@@ -360,9 +374,9 @@
     </div>
 
     <div>
-      <img src="img/fuzzy-folder-search.png"
+      <a class="zoomable" href="img/fuzzy-folder-search.png" title="Open full screen"><img src="img/fuzzy-folder-search.png"
            width="660" height="800"
-           alt="The Advanced Bookmarks dialog: typing “blo” in the Folder field instantly filters the bookmark tree down to blog, blog-internal and bloh, with matched letters highlighted and each folder's full path shown underneath.">
+           alt="The Advanced Bookmarks dialog: typing “blo” in the Folder field instantly filters the bookmark tree down to blog, blog-internal and bloh, with matched letters highlighted and each folder's full path shown underneath."></a>
     </div>
   </div>
 </header>
@@ -466,13 +480,13 @@
 
     <div class="shots">
       <figure>
-        <img src="img/auto-filled-dialog.png" width="880" height="800"
-             alt="The dialog pre-filled with a long GitHub page title and URL, with “prom” typed into the folder field narrowing the tree to a single matching folder.">
+        <a class="zoomable" href="img/auto-filled-dialog.png" title="Open full screen"><img src="img/auto-filled-dialog.png" width="880" height="800"
+             alt="The dialog pre-filled with a long GitHub page title and URL, with “prom” typed into the folder field narrowing the tree to a single matching folder."></a>
         <figcaption>Name and URL come pre-filled from the tab. Type in the folder field to narrow the tree.</figcaption>
       </figure>
       <figure>
-        <img src="img/new-folder-dialog.png" width="860" height="800"
-             alt="The New folder dialog, with a name field and a Location dropdown listing every existing folder by its full path.">
+        <a class="zoomable" href="img/new-folder-dialog.png" title="Open full screen"><img src="img/new-folder-dialog.png" width="860" height="800"
+             alt="The New folder dialog, with a name field and a Location dropdown listing every existing folder by its full path."></a>
         <figcaption>No match? Create the folder inline and pick its parent from the full path list.</figcaption>
       </figure>
     </div>
@@ -629,5 +643,127 @@
   </div>
 </footer>
 
+<script>
+/* full-screen viewer for <a class="zoomable" href="image"><img></a>.
+   Pinch or ctrl+wheel zooms around the pointer, scroll or drag pans, +/-/0 keys, Esc closes.
+   The image is resized, not CSS-scaled. */
+(function () {
+  var links = document.querySelectorAll('a.zoomable');
+  if (!links.length) return;
+  var viewer = document.createElement('div');
+  viewer.className = 'zoom-viewer';
+  viewer.hidden = true;
+  viewer.setAttribute('role', 'dialog');
+  viewer.setAttribute('aria-modal', 'true');
+  viewer.innerHTML = '<div class="zoom-bar"><span class="zoom-level"></span>' +
+    '<button type="button" data-z="out" aria-label="Zoom out">\u2212</button>' +
+    '<button type="button" data-z="fit" aria-label="Fit to screen">Fit</button>' +
+    '<button type="button" data-z="in" aria-label="Zoom in">+</button>' +
+    '<button type="button" data-z="close" aria-label="Close">\u2715</button></div>' +
+    '<div class="zoom-stage"><img alt=""></div>';
+  document.body.appendChild(viewer);
+  var stage = viewer.querySelector('.zoom-stage');
+  var img = stage.querySelector('img');
+  var level = viewer.querySelector('.zoom-level');
+  var natW = 1, natH = 1, fit = 1, scale = 1, opener = null;
+
+  function apply(next, cx, cy) {
+    next = Math.min(Math.max(next, fit * 0.5), 8);
+    // keep the point under (cx, cy) in place
+    var r = stage.getBoundingClientRect();
+    cx = cx === undefined ? r.width / 2 : cx - r.left;
+    cy = cy === undefined ? r.height / 2 : cy - r.top;
+    var fx = (stage.scrollLeft + cx) / (natW * scale), fy = (stage.scrollTop + cy) / (natH * scale);
+    scale = next;
+    img.style.width = Math.round(natW * scale) + 'px';
+    img.style.height = Math.round(natH * scale) + 'px';
+    stage.scrollLeft = fx * natW * scale - cx;
+    stage.scrollTop = fy * natH * scale - cy;
+    level.textContent = Math.round(scale * 100) + '%';
+  }
+  function fitScale() {
+    var r = stage.getBoundingClientRect();
+    return Math.min((r.width - 32) / natW, (r.height - 24) / natH);
+  }
+  function open(href, alt, a) {
+    opener = a;
+    img.alt = alt || '';
+    viewer.hidden = false;
+    document.documentElement.style.overflow = 'hidden';
+    img.onload = function () {
+      natW = img.naturalWidth || 1200; natH = img.naturalHeight || 800;
+      fit = fitScale(); scale = fit; apply(fit);
+    };
+    img.src = href;
+    viewer.querySelector('[data-z="close"]').focus();
+  }
+  function close() {
+    viewer.hidden = true;
+    document.documentElement.style.overflow = '';
+    if (opener) opener.focus();
+  }
+  links.forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      if (e.metaKey || e.ctrlKey || e.shiftKey) return; // let new-tab clicks through
+      e.preventDefault();
+      var i = a.querySelector('img');
+      open(a.getAttribute('href'), i && i.alt, a);
+    });
+  });
+  viewer.addEventListener('click', function (e) {
+    var z = e.target.getAttribute && e.target.getAttribute('data-z');
+    if (z === 'in') apply(scale * 1.25);
+    else if (z === 'out') apply(scale / 1.25);
+    else if (z === 'fit') apply(fit);
+    else if (z === 'close' || e.target === stage) close();
+  });
+  // trackpad pinch arrives as ctrl+wheel; plain scrolling pans natively
+  stage.addEventListener('wheel', function (e) {
+    if (!e.ctrlKey && !e.metaKey) return;
+    e.preventDefault();
+    apply(scale * Math.exp(-e.deltaY * 0.01), e.clientX, e.clientY);
+  }, { passive: false });
+  document.addEventListener('keydown', function (e) {
+    if (viewer.hidden) return;
+    if (e.key === 'Escape') close();
+    else if (e.key === '+' || e.key === '=') apply(scale * 1.25);
+    else if (e.key === '-') apply(scale / 1.25);
+    else if (e.key === '0') apply(fit);
+  });
+  window.addEventListener('resize', function () { if (!viewer.hidden) fit = fitScale(); });
+
+  // drag to pan with one pointer, pinch to zoom with two
+  var pts = {}, last = null, pinch = 0, moved = false;
+  stage.addEventListener('pointerdown', function (e) {
+    pts[e.pointerId] = e; stage.setPointerCapture(e.pointerId);
+    stage.classList.add('dragging'); last = e; moved = false;
+  });
+  stage.addEventListener('pointermove', function (e) {
+    if (!pts[e.pointerId]) return;
+    pts[e.pointerId] = e;
+    var ids = Object.keys(pts);
+    if (ids.length === 2) {
+      var a = pts[ids[0]], b = pts[ids[1]];
+      var d = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+      if (pinch) apply(scale * d / pinch, (a.clientX + b.clientX) / 2, (a.clientY + b.clientY) / 2);
+      pinch = d; moved = true;
+    } else if (last) {
+      stage.scrollLeft -= e.clientX - last.clientX;
+      stage.scrollTop -= e.clientY - last.clientY;
+      if (Math.abs(e.clientX - last.clientX) + Math.abs(e.clientY - last.clientY) > 0) moved = true;
+      last = e;
+    }
+  });
+  function up(e) {
+    delete pts[e.pointerId];
+    if (Object.keys(pts).length < 2) pinch = 0;
+    if (!Object.keys(pts).length) { stage.classList.remove('dragging'); last = null; }
+  }
+  stage.addEventListener('pointerup', up);
+  stage.addEventListener('pointercancel', up);
+  // a click on the backdrop closes, but not the end of a drag
+  stage.addEventListener('click', function (e) { if (moved) e.stopPropagation(); }, true);
+})();
+</script>
 </body>
 </html>
